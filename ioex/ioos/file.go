@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"reflect"
 
-	"github.com/ahl5esoft/lite-go/lib/ioex"
+	"github.com/ahl5esoft/lite-go/ioex"
 )
 
 type file struct {

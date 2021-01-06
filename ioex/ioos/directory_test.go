@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/ahl5esoft/lite-go/lib/ioex/iopath"
+	"github.com/ahl5esoft/lite-go/ioex/iopath"
 
 	"github.com/stretchr/testify/assert"
 )

@@ -4,8 +4,8 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/ahl5esoft/lite-go/lib/ioex"
-	"github.com/ahl5esoft/lite-go/lib/ioex/iopath"
+	"github.com/ahl5esoft/lite-go/ioex"
+	"github.com/ahl5esoft/lite-go/ioex/iopath"
 
 	underscore "github.com/ahl5esoft/golang-underscore"
 )
