@@ -1,6 +1,7 @@
-# ![Version](https://img.shields.io/badge/version-0.0.3-green.svg)
+# ![Version](https://img.shields.io/badge/version-0.0.4-green.svg)
 
 ## 结构
+* api - api相关
 * dp - 设计模式
 * ioex - io扩展
   * ioos - 系统文件
@@ -10,3 +11,4 @@
     * identity - 标识
     * mongodb - mongo
     * mysqldb - mysql
+  * ginex - gin扩展(http请求)
