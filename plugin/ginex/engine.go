@@ -18,15 +18,6 @@ type uriStruct struct {
 	Name     string `uri:"name" binding:"required"`
 }
 
-// Listen is 监听http
-func Listen(port int, mode string) {
-	gin.SetMode(mode)
-
-	addr := fmt.Sprintf(":%d", port)
-	fmt.Println(addr)
-	newEngine().Run(addr)
-}
-
 func newEngine() *gin.Engine {
 	app := gin.New()
 	app.POST(

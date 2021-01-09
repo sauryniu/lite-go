@@ -5,7 +5,7 @@ type ErrorCode int
 
 const (
 	// APIErrorCode is api错误码
-	APIErrorCode ErrorCode = iota + 500
+	APIErrorCode ErrorCode = iota + 501
 	// AuthErrorCode is 认证错误码
 	AuthErrorCode
 	// VerifyErrorCode is 验证错误码

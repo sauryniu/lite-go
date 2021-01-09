@@ -1,4 +1,4 @@
-# ![Version](https://img.shields.io/badge/version-0.0.4-green.svg)
+# ![Version](https://img.shields.io/badge/version-0.0.5-green.svg)
 
 ## 结构
 * api - api相关
@@ -9,6 +9,8 @@
 * plugin - 插件(第三方)
   * db - 数据库相关
     * identity - 标识
-    * mongodb - mongo
-    * mysqldb - mysql
-  * ginex - gin扩展(http请求)
+    * mongodb - mongo相关
+    * mysqldb - mysql相关
+  * ginex - gin相关(http请求)
+  * redisex - redis相关
+  * thread - 锁
