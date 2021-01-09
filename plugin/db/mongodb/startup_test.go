@@ -7,8 +7,16 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+type startupContext struct {
+	MongoOption FactoryOption
+}
+
+func (m startupContext) GetMongoOption() FactoryOption {
+	return m.MongoOption
+}
+
 func Test_NewStartup(t *testing.T) {
-	err := NewStartup().Handle(&StartupContext{
+	err := NewStartup().Handle(&startupContext{
 		MongoOption: FactoryOption{
 			DbName: "lite-go",
 			URI:    "mongodb://localhost:27017",

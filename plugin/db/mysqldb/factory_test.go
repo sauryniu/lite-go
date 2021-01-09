@@ -9,8 +9,8 @@ import (
 func Test_factory_Db(t *testing.T) {
 	self, err := New(FactoryOption{
 		DbName:   "go-test",
-		Host:     "mysql.szy.com",
-		Password: "szy123456",
+		Host:     "10.1.33.67",
+		Password: "123456",
 		Username: "root",
 	})
 
@@ -26,8 +26,8 @@ func Test_factory_Db(t *testing.T) {
 func Test_factory_Db_extra(t *testing.T) {
 	self, err := New(FactoryOption{
 		DbName:   "go-test",
-		Host:     "mysql.szy.com",
-		Password: "szy123456",
+		Host:     "10.1.33.67",
+		Password: "123456",
 		Username: "root",
 	})
 
@@ -66,8 +66,8 @@ func Test_factory_Db_extra(t *testing.T) {
 func Test_factory_Uow(t *testing.T) {
 	self, err := New(FactoryOption{
 		DbName:   "go-test",
-		Host:     "mysql.szy.com",
-		Password: "szy123456",
+		Host:     "10.1.33.67",
+		Password: "123456",
 		Username: "root",
 	})
 

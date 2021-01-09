@@ -10,8 +10,21 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+type startupContext struct {
+	RedisLockOption *redis.Options
+	RedisOption     *redis.Options
+}
+
+func (m startupContext) GetRedisLockOption() *redis.Options {
+	return m.RedisLockOption
+}
+
+func (m startupContext) GetRedisOption() *redis.Options {
+	return m.RedisOption
+}
+
 func Test_NewStartupHandler_RedisLockOption(t *testing.T) {
-	err := NewStartupHandler().Handle(&StartupContext{
+	err := NewStartupHandler().Handle(&startupContext{
 		RedisLockOption: &redis.Options{
 			Addr: "127.0.0.1:6379",
 		},
@@ -33,7 +46,7 @@ func Test_NewStartupHandler_RedisLockOption(t *testing.T) {
 }
 
 func Test_NewStartupHandler_RedisOption(t *testing.T) {
-	err := NewStartupHandler().Handle(&StartupContext{
+	err := NewStartupHandler().Handle(&startupContext{
 		RedisOption: &redis.Options{
 			Addr: "127.0.0.1:6379",
 		},

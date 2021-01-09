@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_NewStartup(t *testing.T) {
-	err := NewStartup().Handle(nil)
+func Test_NewStartupHandler(t *testing.T) {
+	err := NewStartupHandler().Handle(nil)
 	assert.NoError(t, err)
 }

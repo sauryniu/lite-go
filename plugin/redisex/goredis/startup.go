@@ -7,28 +7,31 @@ import (
 	"github.com/go-redis/redis"
 )
 
-// StartupContext is 启动上下文
-type StartupContext struct {
-	RedisOption     *redis.Options
-	RedisLockOption *redis.Options
+// IStartupContext is 启动上下文接口
+type IStartupContext interface {
+	GetRedisOption() *redis.Options
+	GetRedisLockOption() *redis.Options
 }
 
 // NewStartupHandler is 启动处理器
 func NewStartupHandler() cor.IHandler {
 	return cor.New(func(ctx interface{}) error {
-		if sCtx, ok := ctx.(*StartupContext); ok {
-			if sCtx.RedisLockOption != nil {
-				redis := New(sCtx.RedisLockOption)
+		if sCtx, ok := ctx.(IStartupContext); ok {
+			if sCtx.GetRedisLockOption() != nil {
+				redis := New(
+					sCtx.GetRedisLockOption(),
+				)
 				ioc.Set(
 					"lock",
 					redisex.NewLock(redis),
 				)
 			}
 
-			if sCtx.RedisOption != nil {
+			redisOption := sCtx.GetRedisOption()
+			if redisOption != nil {
 				ioc.Set(
 					"redis",
-					New(sCtx.RedisOption),
+					New(redisOption),
 				)
 			}
 		}

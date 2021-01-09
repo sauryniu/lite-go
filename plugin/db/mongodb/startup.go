@@ -5,16 +5,18 @@ import (
 	"github.com/ahl5esoft/lite-go/dp/ioc"
 )
 
-// StartupContext is 启动上下文
-type StartupContext struct {
-	MongoOption FactoryOption
+// IStartupContext is 启动上下文接口
+type IStartupContext interface {
+	GetMongoOption() FactoryOption
 }
 
 // NewStartup is 启动处理器
 func NewStartup() cor.IHandler {
 	return cor.New(func(ctx interface{}) error {
-		if sCtx, ok := ctx.(*StartupContext); ok {
-			f, err := New(sCtx.MongoOption)
+		if sCtx, ok := ctx.(IStartupContext); ok {
+			f, err := New(
+				sCtx.GetMongoOption(),
+			)
 			if err != nil {
 				return err
 			}
