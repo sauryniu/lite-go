@@ -12,25 +12,16 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type testAuthAPI struct {
-}
-
-func (m testAuthAPI) Auth() bool {
-	return false
-}
-
-func (m testAuthAPI) Call() interface{} {
-	return nil
-}
-
-func (m testAuthAPI) Valid(ctx interface{}) bool {
-	return false
-}
-
 func Test_newEngine_认证(t *testing.T) {
 	endpoint := "endpoint"
 	name := "auth"
-	api.Register(endpoint, name, testAuthAPI{})
+	api.Register(endpoint, name, func() api.IAPI {
+		return &API{
+			AuthFunc: func() bool {
+				return false
+			},
+		}
+	})
 
 	resp := httptest.NewRecorder()
 	req, _ := http.NewRequest(
@@ -58,18 +49,24 @@ func (m testValidAPI) Auth() bool {
 	return true
 }
 
-func (m testValidAPI) Call() interface{} {
-	return nil
+func (m testValidAPI) Call() (interface{}, error) {
+	return nil, nil
 }
 
-func (m testValidAPI) Valid(ctx interface{}) bool {
+func (m testValidAPI) SetRequest(_ interface{}) {
+
+}
+
+func (m testValidAPI) Valid() bool {
 	return false
 }
 
 func Test_newEngine_验证(t *testing.T) {
 	endpoint := "endpoint"
 	name := "verify"
-	api.Register(endpoint, name, testValidAPI{})
+	api.Register(endpoint, name, func() api.IAPI {
+		return &testValidAPI{}
+	})
 
 	resp := httptest.NewRecorder()
 	req, _ := http.NewRequest(
@@ -115,26 +112,17 @@ func Test_newEngine_InvalidAPI(t *testing.T) {
 	)
 }
 
-type testAPIErrorAPI struct {
-}
-
-func (m testAPIErrorAPI) Auth() bool {
-	return true
-}
-
-func (m testAPIErrorAPI) Call() interface{} {
-	api.Throw(11, "msg")
-	return nil
-}
-
-func (m testAPIErrorAPI) Valid(ctx interface{}) bool {
-	return true
-}
-
 func Test_newEngine_apierror(t *testing.T) {
 	endpoint := "endpoint"
 	name := "apierror"
-	api.Register(endpoint, name, testAPIErrorAPI{})
+	api.Register(endpoint, name, func() api.IAPI {
+		return &API{
+			CallFunc: func() (interface{}, error) {
+				api.Throw(11, "msg")
+				return nil, nil
+			},
+		}
+	})
 
 	resp := httptest.NewRecorder()
 	req, _ := http.NewRequest(
@@ -155,25 +143,16 @@ func Test_newEngine_apierror(t *testing.T) {
 	)
 }
 
-type testPanicAPI struct {
-}
-
-func (m testPanicAPI) Auth() bool {
-	return true
-}
-
-func (m testPanicAPI) Call() interface{} {
-	panic("p")
-}
-
-func (m testPanicAPI) Valid(ctx interface{}) bool {
-	return true
-}
-
 func Test_newEngine_panicAPI(t *testing.T) {
 	endpoint := "endpoint"
 	name := "panic"
-	api.Register(endpoint, name, testPanicAPI{})
+	api.Register(endpoint, name, func() api.IAPI {
+		return &API{
+			CallFunc: func() (interface{}, error) {
+				panic("p")
+			},
+		}
+	})
 
 	resp := httptest.NewRecorder()
 	req, _ := http.NewRequest(
@@ -195,27 +174,25 @@ func Test_newEngine_panicAPI(t *testing.T) {
 }
 
 type testOKAPI struct {
-	publicAPI
+	*API
 
 	Name string `binding:"min=1,max=10"`
-}
-
-func (m testOKAPI) Call() interface{} {
-	return m.Name
-}
-
-func (m *testOKAPI) Valid(ctx interface{}) bool {
-	return m.publicAPI.ValidDerive(ctx, m)
 }
 
 func Test_newEngine_ok(t *testing.T) {
 	endpoint := "endpoint"
 	name := "ok"
-	api.Register(
-		endpoint,
-		name,
-		new(testOKAPI),
-	)
+	api.Register(endpoint, name, func() api.IAPI {
+		var a *testOKAPI
+		a = &testOKAPI{
+			API: &API{
+				CallFunc: func() (interface{}, error) {
+					return "hello", nil
+				},
+			},
+		}
+		return a
+	})
 
 	resp := httptest.NewRecorder()
 	req, _ := http.NewRequest(

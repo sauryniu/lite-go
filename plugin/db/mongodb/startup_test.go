@@ -15,8 +15,8 @@ func (m startupContext) GetMongoOption() FactoryOption {
 	return m.MongoOption
 }
 
-func Test_NewStartup(t *testing.T) {
-	err := NewStartup().Handle(&startupContext{
+func Test_NewStartupHandler(t *testing.T) {
+	err := NewStartupHandler().Handle(&startupContext{
 		MongoOption: FactoryOption{
 			DbName: "lite-go",
 			URI:    "mongodb://localhost:27017",

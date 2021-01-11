@@ -3,8 +3,10 @@ package ginex
 import (
 	"fmt"
 	"net/http"
+	"runtime/debug"
 
 	"github.com/ahl5esoft/lite-go/api"
+	"github.com/ahl5esoft/lite-go/dp/ioc"
 	"github.com/gin-gonic/gin"
 )
 
@@ -24,36 +26,42 @@ func newEngine() *gin.Engine {
 		"/:endpoint/:name",
 		func(ctx *gin.Context) {
 			var resp response
+			resp.Data = ""
+
+			var err error
 			defer func() {
 				if rv := recover(); rv != nil {
-					if err, ok := rv.(api.CustomError); ok {
-						resp.Error = int(err.Code)
-						resp.Data = err.Error()
+					if cErr, ok := rv.(api.CustomError); ok {
+						resp.Error = int(cErr.Code)
+						resp.Data = cErr.Error()
 					} else {
 						fmt.Println(rv)
-
-						resp.Data = ""
+						debug.PrintStack()
 						resp.Error = int(api.PanicErrorCode)
 					}
+				} else if err != nil {
+					fmt.Println(err)
+					debug.PrintStack()
+					resp.Error = int(api.PanicErrorCode)
 				}
 
 				ctx.JSON(http.StatusOK, resp)
 			}()
 
 			var us uriStruct
-			if err := ctx.ShouldBindUri(&us); err != nil {
-				panic(err)
+			if err = ctx.ShouldBindUri(&us); err != nil {
+				return
 			}
 
 			a := api.New(us.Endpoint, us.Name)
+			ioc.Inject(a)
+			a.SetRequest(ctx)
 			if !a.Auth() {
-				resp.Data = ""
 				resp.Error = int(api.AuthErrorCode)
-			} else if !a.Valid(ctx) {
-				resp.Data = ""
+			} else if !a.Valid() {
 				resp.Error = int(api.VerifyErrorCode)
 			} else {
-				resp.Data = a.Call()
+				resp.Data, err = a.Call()
 			}
 		},
 	)

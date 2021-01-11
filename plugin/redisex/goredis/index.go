@@ -72,6 +72,10 @@ func (m goRedis) SetNX(key, value string, expires time.Duration) (bool, error) {
 	return m.Client.SetNX(key, value, expires).Result()
 }
 
+func (m goRedis) Time() (time.Time, error) {
+	return m.Client.Time().Result()
+}
+
 // New is IRedis实例
 func New(options *redis.Options) redisex.IRedis {
 	return &goRedis{

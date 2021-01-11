@@ -10,8 +10,8 @@ type IStartupContext interface {
 	GetMongoOption() FactoryOption
 }
 
-// NewStartup is 启动处理器
-func NewStartup() cor.IHandler {
+// NewStartupHandler is 启动处理器
+func NewStartupHandler() cor.IHandler {
 	return cor.New(func(ctx interface{}) error {
 		if sCtx, ok := ctx.(IStartupContext); ok {
 			f, err := New(

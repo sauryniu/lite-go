@@ -42,7 +42,7 @@ func (m *identityStruct) GetIDField() (IField, error) {
 	fields := m.FindFields()
 	if m.idIndex == -1 {
 		return nil, fmt.Errorf(
-			"缺少标识: %s",
+			`缺少^db:"主键,表名"^: %s`,
 			m.StructType.Name(),
 		)
 	}

@@ -8,11 +8,15 @@ func (m invalidAPI) Auth() bool {
 	return true
 }
 
-func (m invalidAPI) Call() interface{} {
+func (m invalidAPI) Call() (interface{}, error) {
 	Throw(APIErrorCode, "")
-	return nil
+	return nil, nil
 }
 
-func (m invalidAPI) Valid(ctx interface{}) bool {
+func (m invalidAPI) SetRequest(_ interface{}) {
+
+}
+
+func (m invalidAPI) Valid() bool {
 	return true
 }
