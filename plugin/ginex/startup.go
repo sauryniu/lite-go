@@ -13,16 +13,19 @@ type IStartupContext interface {
 	GetGinMock() (http.ResponseWriter, *http.Request)
 	GetGinMode() string
 	GetGinPort() int
+	HandleGinCtx(ctx *gin.Context)
 }
 
 // NewStartupHandler is 启动处理器
 func NewStartupHandler() cor.IHandler {
 	return cor.New(func(ctx interface{}) error {
 		if sCtx, ok := ctx.(IStartupContext); ok {
-			engine := newEngine()
+			app := gin.New()
+			app.POST("/:endpoint/:name", sCtx.HandleGinCtx)
+
 			resp, req := sCtx.GetGinMock()
 			if resp != nil && req != nil {
-				engine.ServeHTTP(resp, req)
+				app.ServeHTTP(resp, req)
 			} else {
 				mode := sCtx.GetGinMode()
 				if mode == "" {
@@ -35,7 +38,7 @@ func NewStartupHandler() cor.IHandler {
 					sCtx.GetGinPort(),
 				)
 				fmt.Println(addr)
-				engine.Run(addr)
+				app.Run(addr)
 			}
 		}
 		return nil
