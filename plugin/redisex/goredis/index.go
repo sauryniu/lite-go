@@ -1,7 +1,6 @@
 package goredis
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/ahl5esoft/lite-go/plugin/redisex"
@@ -14,7 +13,7 @@ type goRedis struct {
 
 func (m goRedis) Get(key string) (string, error) {
 	res, err := m.Client.Get(key).Result()
-	if err != redis.Nil {
+	if err != nil && err != redis.Nil {
 		return "", err
 	}
 
@@ -43,7 +42,6 @@ func (m goRedis) Set(key, value string, extraArgs ...interface{}) (ok bool, err 
 			ok, err = m.Client.SetXX(key, value, 0).Result()
 		}
 	} else if len(extraArgs) == 2 {
-		fmt.Println(extraArgs[1])
 		res, err = m.Client.Set(
 			key,
 			value,

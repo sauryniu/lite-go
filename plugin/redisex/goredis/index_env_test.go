@@ -128,7 +128,7 @@ func Test_goRedis_Set_XX(t *testing.T) {
 }
 
 func Test_goRedis_Set_EX(t *testing.T) {
-	key := "Test_goRedis_SetNX_EX"
+	key := "Test_goRedis_Set_EX"
 	defer self.Del(key)
 
 	duration := 1 * time.Second
@@ -136,7 +136,7 @@ func Test_goRedis_Set_EX(t *testing.T) {
 	assert.NoError(t, err)
 	assert.True(t, ok)
 
-	time.Sleep(duration)
+	time.Sleep(duration * 2)
 
 	res, err := client.Get(key).Result()
 	assert.Equal(t, err, redis.Nil)
@@ -160,7 +160,7 @@ func Test_goRedis_Set_EX_NX(t *testing.T) {
 	assert.NoError(t, err)
 	assert.False(t, ok)
 
-	time.Sleep(duration)
+	time.Sleep(duration * 2)
 
 	ok, err = self.Set(key, "a", "ex", duration, "nx")
 	assert.NoError(t, err)
@@ -182,7 +182,7 @@ func Test_goRedis_Set_EX_XX(t *testing.T) {
 	assert.NoError(t, err)
 	assert.True(t, ok)
 
-	time.Sleep(duration)
+	time.Sleep(duration * 2)
 
 	_, err = client.Get(key).Result()
 	assert.Equal(t, err, redis.Nil)
@@ -197,7 +197,7 @@ func Test_goRedis_Set_PX(t *testing.T) {
 	assert.NoError(t, err)
 	assert.True(t, ok)
 
-	time.Sleep(duration)
+	time.Sleep(duration * 2)
 
 	res, err := client.Get(key).Result()
 	assert.Equal(t, err, redis.Nil)
@@ -221,7 +221,7 @@ func Test_goRedis_Set_PX_NX(t *testing.T) {
 	assert.NoError(t, err)
 	assert.False(t, ok)
 
-	time.Sleep(duration)
+	time.Sleep(duration * 2)
 
 	ok, err = self.Set(key, "a", "px", duration, "nx")
 	assert.NoError(t, err)
@@ -243,7 +243,7 @@ func Test_goRedis_Set_PX_XX(t *testing.T) {
 	assert.NoError(t, err)
 	assert.True(t, ok)
 
-	time.Sleep(duration)
+	time.Sleep(duration * 2)
 
 	_, err = client.Get(key).Result()
 	assert.Equal(t, err, redis.Nil)

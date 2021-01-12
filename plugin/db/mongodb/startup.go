@@ -3,6 +3,7 @@ package mongodb
 import (
 	"github.com/ahl5esoft/lite-go/dp/cor"
 	"github.com/ahl5esoft/lite-go/dp/ioc"
+	"github.com/ahl5esoft/lite-go/plugin/db"
 )
 
 // IStartupContext is 启动上下文接口
@@ -21,7 +22,7 @@ func NewStartupHandler() cor.IHandler {
 				return err
 			}
 
-			ioc.Set("db", f)
+			ioc.Set(db.IoCKey, f)
 		}
 		return nil
 	})

@@ -14,16 +14,18 @@ type testStruct struct {
 }
 
 func Test_identityStruct_FindFields(t *testing.T) {
-	fields := NewStruct(
-		reflect.TypeOf(testStruct{}),
-	).FindFields()
+	structType := reflect.TypeOf(testStruct{})
+	fields := NewStruct(structType).FindFields()
+	defer delete(structTypeOfStruct, structType)
+
 	assert.Len(t, fields, 2)
 }
 
 func Test_identityStruct_GetIDField(t *testing.T) {
-	idField, err := NewStruct(
-		reflect.TypeOf(testStruct{}),
-	).GetIDField()
+	structType := reflect.TypeOf(testStruct{})
+	idField, err := NewStruct(structType).GetIDField()
+	defer delete(structTypeOfStruct, structType)
+
 	assert.NoError(t, err)
 	assert.Equal(
 		t,
@@ -45,21 +47,24 @@ type testMissIDStruct struct {
 func Test_identityStruct_GetIDField_Error(t *testing.T) {
 	structType := reflect.TypeOf(testMissIDStruct{})
 	_, err := NewStruct(structType).GetIDField()
+	defer delete(structTypeOfStruct, structType)
+
 	assert.Error(t, err)
 	assert.Equal(
 		t,
 		err.Error(),
 		fmt.Sprintf(
-			"缺少标识: %s",
+			`缺少^db:"主键,表名"^: %s`,
 			structType.Name(),
 		),
 	)
 }
 
 func Test_identityStruct_GetName(t *testing.T) {
-	res, err := NewStruct(
-		reflect.TypeOf(testStruct{}),
-	).GetName()
+	structType := reflect.TypeOf(testStruct{})
+	res, err := NewStruct(structType).GetName()
+	defer delete(structTypeOfStruct, structType)
+
 	assert.NoError(t, err)
 	assert.Equal(t, res, "test")
 }
@@ -67,12 +72,14 @@ func Test_identityStruct_GetName(t *testing.T) {
 func Test_identityStruct_GetName_Error(t *testing.T) {
 	structType := reflect.TypeOf(testMissIDStruct{})
 	res, err := NewStruct(structType).GetName()
+	defer delete(structTypeOfStruct, structType)
+
 	assert.Empty(t, res)
 	assert.Equal(
 		t,
 		err.Error(),
 		fmt.Sprintf(
-			"缺少标识: %s",
+			`缺少^db:"主键,表名"^: %s`,
 			structType.Name(),
 		),
 	)
