@@ -7,6 +7,7 @@ package redisex
 import (
 	gomock "github.com/golang/mock/gomock"
 	reflect "reflect"
+	time "time"
 )
 
 // MockIRedis is a mock of IRedis interface
@@ -99,4 +100,19 @@ func (mr *MockIRedisMockRecorder) Set(arg0, arg1 interface{}, arg2 ...interface{
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Set", reflect.TypeOf((*MockIRedis)(nil).Set), varargs...)
+}
+
+// Time mocks base method
+func (m *MockIRedis) Time() (time.Time, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Time")
+	ret0, _ := ret[0].(time.Time)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Time indicates an expected call of Time
+func (mr *MockIRedisMockRecorder) Time() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Time", reflect.TypeOf((*MockIRedis)(nil).Time))
 }
