@@ -20,6 +20,12 @@ type IStartupContext interface {
 func NewStartupHandler() cor.IHandler {
 	return cor.New(func(ctx interface{}) error {
 		if sCtx, ok := ctx.(IStartupContext); ok {
+			mode := sCtx.GetGinMode()
+			if mode == "" {
+				mode = gin.DebugMode
+			}
+			gin.SetMode(mode)
+
 			app := gin.New()
 			app.POST("/:endpoint/:name", sCtx.HandleGinCtx)
 
@@ -27,12 +33,6 @@ func NewStartupHandler() cor.IHandler {
 			if resp != nil && req != nil {
 				app.ServeHTTP(resp, req)
 			} else {
-				mode := sCtx.GetGinMode()
-				if mode == "" {
-					mode = gin.DebugMode
-				}
-				gin.SetMode(mode)
-
 				addr := fmt.Sprintf(
 					":%d",
 					sCtx.GetGinPort(),

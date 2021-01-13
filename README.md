@@ -1,4 +1,4 @@
-# ![Version](https://img.shields.io/badge/version-0.0.11-green.svg)
+# ![Version](https://img.shields.io/badge/version-0.0.12-green.svg)
 
 ## 结构
 * api - api相关
@@ -7,6 +7,7 @@
   * ioos - 系统文件
   * iopath - 路径
 * object - 基础对象相关
+* osex - 系统相关
 * plugin - 插件(第三方)
   * db - 数据库相关
     * identity - 标识
