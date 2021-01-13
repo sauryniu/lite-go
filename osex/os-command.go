@@ -12,24 +12,26 @@ import (
 const expiredText = "执行超时"
 
 type osCommand struct {
-	Cmd     *exec.Cmd
 	Expires time.Duration
+
+	cmd *exec.Cmd
 }
 
-func (m osCommand) Exec() (string, string, error) {
-	errReader, err := m.Cmd.StderrPipe()
+func (m osCommand) Exec(name string, args ...string) (string, string, error) {
+	m.cmd = exec.Command(name, args...)
+	errReader, err := m.cmd.StderrPipe()
 	if err != nil {
 		return "", "", err
 	}
 	defer errReader.Close()
 
-	outReader, err := m.Cmd.StdoutPipe()
+	outReader, err := m.cmd.StdoutPipe()
 	if err != nil {
 		return "", "", err
 	}
 	defer outReader.Close()
 
-	if err = m.Cmd.Start(); err != nil {
+	if err = m.cmd.Start(); err != nil {
 		return "", "", err
 	}
 
@@ -37,7 +39,7 @@ func (m osCommand) Exec() (string, string, error) {
 }
 
 func (m *osCommand) SetDir(format string, args ...interface{}) ICommand {
-	m.Cmd.Dir = fmt.Sprintf(format, args...)
+	m.cmd.Dir = fmt.Sprintf(format, args...)
 	return m
 }
 
@@ -49,7 +51,7 @@ func (m *osCommand) SetExpires(expires time.Duration) ICommand {
 func (m osCommand) exec(errReader, outReader io.ReadCloser) (string, string, error) {
 	errChan := make(chan error)
 	go func() {
-		errChan <- m.Cmd.Wait()
+		errChan <- m.cmd.Wait()
 	}()
 
 	stderrChan := make(chan string)
@@ -90,9 +92,8 @@ func (m osCommand) scan(reader io.ReadCloser, msg chan string) {
 }
 
 // NewOSCommand is 创建ICommand
-func NewOSCommand(name string, args ...string) ICommand {
+func NewOSCommand() ICommand {
 	return &osCommand{
-		Cmd:     exec.Command(name, args...),
 		Expires: 4 * time.Second,
 	}
 }
