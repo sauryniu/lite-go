@@ -17,24 +17,6 @@ var (
 	})
 )
 
-func Test_goRedis_Get(t *testing.T) {
-	key := "Test_goRedis_Get"
-	client.Set(key, "test", 0)
-	res, err := self.Get(key)
-
-	client.Del(key)
-
-	assert.NoError(t, err)
-	assert.Equal(t, res, "test")
-}
-
-func Test_goRedis_Get_不存在(t *testing.T) {
-	key := "Test_goRedis_Get_不存在"
-	res, err := self.Get(key)
-	assert.NoError(t, err)
-	assert.Empty(t, res)
-}
-
 func Test_goRedis_Del(t *testing.T) {
 	key := "Test_goRedis_Del"
 	client.Set(key, "test", 0).Result()
@@ -68,6 +50,39 @@ func Test_goRedis_Exists_已存在(t *testing.T) {
 	ok, err := self.Exists(key)
 	assert.NoError(t, err)
 	assert.True(t, ok)
+}
+
+func Test_goRedis_Eval(t *testing.T) {
+	key := "Test_goRedis_Eval"
+	defer client.Del(key)
+
+	value := "v"
+	_, err := self.Eval(`redis.call("set", KEYS[1], ARGV[1])`, []string{key}, value)
+	assert.NoError(t, err)
+
+	time.Sleep(1 * time.Second)
+
+	res, err := client.Get(key).Result()
+	assert.NoError(t, err)
+	assert.Equal(t, res, value)
+}
+
+func Test_goRedis_Get(t *testing.T) {
+	key := "Test_goRedis_Get"
+	client.Set(key, "test", 0)
+	res, err := self.Get(key)
+
+	client.Del(key)
+
+	assert.NoError(t, err)
+	assert.Equal(t, res, "test")
+}
+
+func Test_goRedis_Get_不存在(t *testing.T) {
+	key := "Test_goRedis_Get_不存在"
+	res, err := self.Get(key)
+	assert.NoError(t, err)
+	assert.Empty(t, res)
 }
 
 func Test_goRedis_Set(t *testing.T) {

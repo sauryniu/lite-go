@@ -67,6 +67,26 @@ func (mr *MockIRedisMockRecorder) Exists(arg0 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Exists", reflect.TypeOf((*MockIRedis)(nil).Exists), arg0)
 }
 
+// Eval mocks base method
+func (m *MockIRedis) Eval(arg0 string, arg1 []string, arg2 ...interface{}) (interface{}, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "Eval", varargs...)
+	ret0, _ := ret[0].(interface{})
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Eval indicates an expected call of Eval
+func (mr *MockIRedisMockRecorder) Eval(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Eval", reflect.TypeOf((*MockIRedis)(nil).Eval), varargs...)
+}
+
 // Get mocks base method
 func (m *MockIRedis) Get(arg0 string) (string, error) {
 	m.ctrl.T.Helper()

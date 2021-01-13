@@ -17,7 +17,8 @@ import (
 )
 
 type startupVerifyContext struct {
-	Resp *httptest.ResponseRecorder
+	BodyJSON string
+	Resp     *httptest.ResponseRecorder
 }
 
 func (m *startupVerifyContext) GetGinMock() (http.ResponseWriter, *http.Request) {
@@ -29,7 +30,7 @@ func (m *startupVerifyContext) GetGinMock() (http.ResponseWriter, *http.Request)
 	req, _ := http.NewRequest(
 		http.MethodPost,
 		fmt.Sprintf("/%s/%s", endpoint, name),
-		strings.NewReader("{}"),
+		strings.NewReader(m.BodyJSON),
 	)
 	req.Header.Add("Content-Type", "application/json")
 	return m.Resp, req
@@ -48,19 +49,45 @@ func (m startupVerifyContext) HandleGinCtx(ctx *gin.Context) {
 }
 
 type verifyAPI struct {
-	Name string `binding:"min=1,max=5"`
+	Name string `binding:"min=1,max=5,required" json:"na"`
 }
 
 func (m verifyAPI) Call() (interface{}, error) {
-	return nil, nil
+	return m.Name, nil
 }
 
 func (m verifyAPI) GetScope() int {
 	return 0
 }
 
-func Test_Verify(t *testing.T) {
-	ctx := new(startupVerifyContext)
+func Test_Verify_OK(t *testing.T) {
+	ctx := &startupVerifyContext{
+		BodyJSON: `{"na":"hello"}`,
+	}
+	handler := mongodb.NewStartupHandler()
+	handler.SetNext(
+		goredis.NewStartupHandler(),
+	).SetNext(
+		ginex.NewStartupHandler(),
+	)
+	err := handler.Handle(ctx)
+	assert.NoError(t, err)
+
+	res, _ := jsoniter.MarshalToString(map[string]interface{}{
+		"data": "hello",
+		"err":  0,
+	})
+	assert.JSONEq(
+		t,
+		res,
+		ctx.Resp.Body.String(),
+	)
+}
+
+func Test_Verify_Fail(t *testing.T) {
+	ctx := &startupVerifyContext{
+		BodyJSON: "{}",
+	}
 	handler := mongodb.NewStartupHandler()
 	handler.SetNext(
 		goredis.NewStartupHandler(),

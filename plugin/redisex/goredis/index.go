@@ -11,15 +11,6 @@ type goRedis struct {
 	Client *redis.Client
 }
 
-func (m goRedis) Get(key string) (string, error) {
-	res, err := m.Client.Get(key).Result()
-	if err != nil && err != redis.Nil {
-		return "", err
-	}
-
-	return res, nil
-}
-
 func (m goRedis) Del(keys ...string) (int, error) {
 	count, err := m.Client.Del(keys...).Result()
 	return int(count), err
@@ -28,6 +19,24 @@ func (m goRedis) Del(keys ...string) (int, error) {
 func (m goRedis) Exists(key string) (bool, error) {
 	num, err := m.Client.Exists(key).Result()
 	return num > 0, err
+}
+
+func (m goRedis) Eval(script string, keys []string, args ...interface{}) (interface{}, error) {
+	res, err := m.Client.Eval(script, keys, args...).Result()
+	if err != nil && err != redis.Nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (m goRedis) Get(key string) (string, error) {
+	res, err := m.Client.Get(key).Result()
+	if err != nil && err != redis.Nil {
+		return "", err
+	}
+
+	return res, nil
 }
 
 func (m goRedis) Set(key, value string, extraArgs ...interface{}) (ok bool, err error) {

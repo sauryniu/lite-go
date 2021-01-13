@@ -9,6 +9,7 @@ const IoCKey = "redis"
 type IRedis interface {
 	Del(...string) (int, error)
 	Exists(string) (bool, error)
+	Eval(string, []string, ...interface{}) (interface{}, error)
 	Get(string) (string, error)
 	Set(string, string, ...interface{}) (bool, error)
 	Time() (time.Time, error)
