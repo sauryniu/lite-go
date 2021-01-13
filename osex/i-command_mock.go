@@ -34,9 +34,13 @@ func (m *MockICommand) EXPECT() *MockICommandMockRecorder {
 }
 
 // Exec mocks base method
-func (m *MockICommand) Exec() (string, string, error) {
+func (m *MockICommand) Exec(name string, args ...string) (string, string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Exec")
+	varargs := []interface{}{name}
+	for _, a := range args {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "Exec", varargs...)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(string)
 	ret2, _ := ret[2].(error)
@@ -44,9 +48,10 @@ func (m *MockICommand) Exec() (string, string, error) {
 }
 
 // Exec indicates an expected call of Exec
-func (mr *MockICommandMockRecorder) Exec() *gomock.Call {
+func (mr *MockICommandMockRecorder) Exec(name interface{}, args ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Exec", reflect.TypeOf((*MockICommand)(nil).Exec))
+	varargs := append([]interface{}{name}, args...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Exec", reflect.TypeOf((*MockICommand)(nil).Exec), varargs...)
 }
 
 // SetDir mocks base method
