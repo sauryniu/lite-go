@@ -27,16 +27,28 @@ func Test_directory_FindDirectories(t *testing.T) {
 	cwd, err := os.Getwd()
 	assert.NoError(t, err)
 
-	childDirPath := iopath.Join(cwd, "child")
+	childDirPath := iopath.Join(cwd, "dir")
 	err = os.Mkdir(childDirPath, os.ModePerm)
 	assert.NoError(t, err)
 
-	res := NewDirectory(cwd).FindDirectories()
+	defer os.Remove(childDirPath)
 
-	err = os.Remove(childDirPath)
+	res := NewDirectory(cwd).FindDirectories()
+	assert.Len(t, res, 1)
+}
+
+func Test_directory_FindFiles(t *testing.T) {
+	cwd, err := os.Getwd()
 	assert.NoError(t, err)
 
-	assert.Len(t, res, 1)
+	childDirPath := iopath.Join(cwd, "files")
+	err = os.Mkdir(childDirPath, os.ModePerm)
+	assert.NoError(t, err)
+
+	defer os.Remove(childDirPath)
+
+	res := NewDirectory(childDirPath).FindFiles()
+	assert.Len(t, res, 0)
 }
 
 func Test_directory_FindDirectories_NotExists(t *testing.T) {

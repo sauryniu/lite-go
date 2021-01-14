@@ -1,6 +1,7 @@
 package ioos
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -31,10 +32,10 @@ func (m file) GetFile() (*os.File, error) {
 	return file, err
 }
 
-func (m file) Read(data interface{}) error {
-	value := reflect.ValueOf(data)
+func (m file) Read(v interface{}) error {
+	value := reflect.ValueOf(v)
 	if value.Kind() != reflect.Ptr {
-		return fmt.Errorf("osex.file.Read: data必须为指针")
+		return fmt.Errorf("osex.file.Read: v必须为指针")
 	}
 
 	f, err := m.GetFile()
@@ -58,12 +59,10 @@ func (m file) Read(data interface{}) error {
 	} else if value.Kind() == reflect.Slice && value.Type().Elem().Kind() == reflect.Uint8 {
 		value.SetBytes(bf)
 		return nil
+	} else {
+		err = json.Unmarshal(bf, v)
+		return err
 	}
-
-	return fmt.Errorf(
-		"osex.file.Read: 不支持%s",
-		value.Type(),
-	)
 }
 
 func (m file) Write(data interface{}) error {

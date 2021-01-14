@@ -52,7 +52,7 @@ func (m directory) FindFiles() []ioex.IFile {
 func (m directory) findNodes(defaultValue interface{}, handleNodeFunc func(r os.FileInfo, nodePath string) interface{}) interface{} {
 	dirPath := m.GetPath()
 	nodes, err := ioutil.ReadDir(dirPath)
-	if err != nil {
+	if err != nil || len(nodes) == 0 {
 		return defaultValue
 	}
 

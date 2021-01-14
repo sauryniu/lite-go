@@ -28,6 +28,41 @@ func Test_file_GetFile(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+func Test_file_Read_JSON(t *testing.T) {
+	wd, err := os.Getwd()
+	assert.NoError(t, err)
+
+	file := NewFile(wd, "read.txt")
+	defer file.Remove()
+
+	f, err := file.GetFile()
+	assert.NoError(t, err)
+
+	defer f.Close()
+
+	text := `{"name":"n","age":11}`
+	_, err = f.WriteString(text)
+	assert.NoError(t, err)
+
+	type testStruct struct {
+		Name string
+		Age  int
+	}
+	var v testStruct
+	err = file.Read(&v)
+	assert.NoError(t, err)
+	assert.Equal(
+		t,
+		v.Name,
+		"n",
+	)
+	assert.Equal(
+		t,
+		v.Age,
+		11,
+	)
+}
+
 func Test_file_Read_Bytes(t *testing.T) {
 	wd, err := os.Getwd()
 	assert.NoError(t, err)
