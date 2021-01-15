@@ -1,4 +1,4 @@
-package ginapi
+package ginex
 
 import (
 	"fmt"
@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	"github.com/ahl5esoft/lite-go/api"
-	"github.com/ahl5esoft/lite-go/plugin/ginex"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 )
@@ -19,7 +18,7 @@ func (m defaultAPI) Call() (interface{}, error) {
 	return "ok", nil
 }
 
-func Test_Default(t *testing.T) {
+func Test_NewPostRunOption(t *testing.T) {
 	endpoint := "endpoint"
 	name := "default"
 	api.Register(endpoint, name, defaultAPI{})
@@ -30,13 +29,14 @@ func Test_Default(t *testing.T) {
 		strings.NewReader(""),
 	)
 	resp := httptest.NewRecorder()
-	ginex.Run(
+	Run(
 		gin.ReleaseMode,
-		ginex.NewPostRunOption(),
-		ginex.NewServeHTTPRunOption(req, resp),
+		NewPostRunOption(),
+		func(app *gin.Engine) {
+			app.ServeHTTP(resp, req)
+		},
 	)
-
-	assert.JSONEq(
+	assert.Equal(
 		t,
 		resp.Body.String(),
 		`{"data":"ok","err":0}`,

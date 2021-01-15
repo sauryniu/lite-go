@@ -4,8 +4,3 @@ package api
 type IAPI interface {
 	Call() (interface{}, error)
 }
-
-// IAPIScope is api作用域接口
-type IAPIScope interface {
-	GetScope() int
-}

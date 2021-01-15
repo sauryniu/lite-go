@@ -9,10 +9,10 @@ import (
 
 	underscore "github.com/ahl5esoft/golang-underscore"
 	"github.com/ahl5esoft/lite-go/api"
+	"github.com/ahl5esoft/lite-go/dp/ioc"
 	"github.com/ahl5esoft/lite-go/plugin/db"
 	"github.com/ahl5esoft/lite-go/plugin/db/mongodb"
 	"github.com/ahl5esoft/lite-go/plugin/ginex"
-	"github.com/ahl5esoft/lite-go/plugin/redisex/goredis"
 	"github.com/gin-gonic/gin"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/stretchr/testify/assert"
@@ -50,10 +50,6 @@ func (m mongoAPI) Call() (interface{}, error) {
 	return entries, nil
 }
 
-func (m mongoAPI) GetScope() int {
-	return 0
-}
-
 type mongoModel struct {
 	ID  string `db:"_id,go-test" bson:"_id"`
 	Age int
@@ -63,53 +59,29 @@ func (m mongoModel) GetID() string {
 	return m.ID
 }
 
-type startupMongoContext struct {
-	Resp *httptest.ResponseRecorder
-}
+func Test_GinMongoAPI(t *testing.T) {
+	dbFactory, err := mongodb.New(mongodb.FactoryOption{
+		DbName: "example",
+		URI:    "mongodb://localhost:27017",
+	})
+	assert.NoError(t, err)
+	ioc.Set(db.IoCKey, dbFactory)
 
-func (m *startupMongoContext) GetGinMock() (http.ResponseWriter, *http.Request) {
 	endpoint := "endpoint"
 	name := "mongo"
 	api.Register(endpoint, name, mongoAPI{})
 
-	m.Resp = httptest.NewRecorder()
 	req, _ := http.NewRequest(
 		http.MethodPost,
 		fmt.Sprintf("/%s/%s", endpoint, name),
 		strings.NewReader(""),
 	)
-	return m.Resp, req
-}
-
-func (m startupMongoContext) GetGinMode() string {
-	return ""
-}
-
-func (m startupMongoContext) GetGinPort() int {
-	return 0
-}
-
-func (m startupMongoContext) GetMongoOption() mongodb.FactoryOption {
-	return mongodb.FactoryOption{
-		DbName: "example",
-		URI:    "mongodb://localhost:27017",
-	}
-}
-
-func (m startupMongoContext) HandleGinCtx(ctx *gin.Context) {
-	handleGinContet(ctx)
-}
-
-func Test_GinMongoAPI(t *testing.T) {
-	ctx := new(startupMongoContext)
-	handler := mongodb.NewStartupHandler()
-	handler.SetNext(
-		goredis.NewStartupHandler(),
-	).SetNext(
-		ginex.NewStartupHandler(),
+	resp := httptest.NewRecorder()
+	ginex.Run(
+		gin.ReleaseMode,
+		ginex.NewPostRunOption(),
+		ginex.NewServeHTTPRunOption(req, resp),
 	)
-	err := handler.Handle(ctx)
-	assert.NoError(t, err)
 
 	var entries []mongoModel
 	underscore.Range(10, 15, 1).Map(func(r int, _ int) mongoModel {
@@ -118,13 +90,13 @@ func Test_GinMongoAPI(t *testing.T) {
 			Age: r,
 		}
 	}).Value(&entries)
-	res, _ := jsoniter.MarshalToString(map[string]interface{}{
-		"data": entries,
-		"err":  0,
+	res, _ := jsoniter.MarshalToString(api.Response{
+		Data:  entries,
+		Error: 0,
 	})
 	assert.JSONEq(
 		t,
+		resp.Body.String(),
 		res,
-		ctx.Resp.Body.String(),
 	)
 }
