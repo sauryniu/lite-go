@@ -7,6 +7,7 @@ const IoCKey = "redis"
 
 // IRedis is redis接口
 type IRedis interface {
+	Close() error
 	Del(...string) (int, error)
 	Exists(string) (bool, error)
 	Eval(string, []string, ...interface{}) (interface{}, error)

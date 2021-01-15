@@ -67,6 +67,14 @@ func Test_goRedis_Eval(t *testing.T) {
 	assert.Equal(t, res, value)
 }
 
+func Test_goRedis_Eval_KeysIsNil(t *testing.T) {
+	key := "Test_goRedis_Eval"
+	defer client.Del(key)
+
+	_, err := self.Eval(`redis.call("time")`, nil)
+	assert.NoError(t, err)
+}
+
 func Test_goRedis_Get(t *testing.T) {
 	key := "Test_goRedis_Get"
 	client.Set(key, "test", 0)

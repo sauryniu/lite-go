@@ -11,6 +11,10 @@ type goRedis struct {
 	Client *redis.Client
 }
 
+func (m goRedis) Close() error {
+	return m.Client.Close()
+}
+
 func (m goRedis) Del(keys ...string) (int, error) {
 	count, err := m.Client.Del(keys...).Result()
 	return int(count), err

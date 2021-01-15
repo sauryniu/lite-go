@@ -33,6 +33,20 @@ func (m *MockIRedis) EXPECT() *MockIRedisMockRecorder {
 	return m.recorder
 }
 
+// Close mocks base method
+func (m *MockIRedis) Close() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Close")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Close indicates an expected call of Close
+func (mr *MockIRedisMockRecorder) Close() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockIRedis)(nil).Close))
+}
+
 // Del mocks base method
 func (m *MockIRedis) Del(arg0 ...string) (int, error) {
 	m.ctrl.T.Helper()
