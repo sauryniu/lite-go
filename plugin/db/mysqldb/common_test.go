@@ -5,6 +5,8 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+const connString = "root:123456@tcp(10.1.30.67:3306)/go-test?charset=utf8"
+
 var sqlxDB *sqlx.DB
 
 type testModel struct {
@@ -18,5 +20,5 @@ func (m testModel) GetID() string {
 }
 
 func init() {
-	sqlxDB, _ = sqlx.Open("mysql", "root:123456@tcp(10.1.30.67:3306)/go-test?charset=utf8")
+	sqlxDB, _ = sqlx.Open("mysql", connString)
 }

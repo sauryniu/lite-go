@@ -100,3 +100,10 @@ func (m *unitOfWork) RegisterSave(entry identity.IIdentity) (err error) {
 	})
 	return
 }
+
+func newUnitOfWork(sqlxDB *sqlx.DB) *unitOfWork {
+	return &unitOfWork{
+		DB:    sqlxDB,
+		Items: make([]unitOfWorkItem, 0),
+	}
+}

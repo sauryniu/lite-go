@@ -10,23 +10,17 @@ import (
 )
 
 func Test_query_Count(t *testing.T) {
-	self := &query{
-		DB:        sqlxDB,
-		ModelType: reflect.TypeOf(testModel{}),
-		Option: queryOption{
-			Orders: make([]orderOption, 0),
-		},
-	}
+	self := newQuery(
+		sqlxDB,
+		reflect.TypeOf(testModel{}),
+	)
 	res, err := self.Count()
 	assert.Nil(t, err)
 	assert.Equal(t, res, int64(0))
 }
 
 func Test_query_Count_有数据(t *testing.T) {
-	uow := &unitOfWork{
-		DB:    sqlxDB,
-		Items: make([]unitOfWorkItem, 0),
-	}
+	uow := newUnitOfWork(sqlxDB)
 	var entries []testModel
 	underscore.Range(0, 25, 1).Map(func(r int, _ int) testModel {
 		entry := testModel{
@@ -40,13 +34,10 @@ func Test_query_Count_有数据(t *testing.T) {
 
 	uow.Commit()
 
-	self := &query{
-		DB:        sqlxDB,
-		ModelType: reflect.TypeOf(entries[0]),
-		Option: queryOption{
-			Orders: make([]orderOption, 0),
-		},
-	}
+	self := newQuery(
+		sqlxDB,
+		reflect.TypeOf(testModel{}),
+	)
 	res, err := self.Count()
 
 	underscore.Chain(entries).Each(func(r testModel, _ int) {
@@ -65,10 +56,7 @@ func Test_query_Count_有数据(t *testing.T) {
 }
 
 func Test_query_Count_有条件(t *testing.T) {
-	uow := &unitOfWork{
-		DB:    sqlxDB,
-		Items: make([]unitOfWorkItem, 0),
-	}
+	uow := newUnitOfWork(sqlxDB)
 	var entries []testModel
 	underscore.Range(0, 4, 1).Map(func(r int, _ int) testModel {
 		entry := testModel{
@@ -82,13 +70,10 @@ func Test_query_Count_有条件(t *testing.T) {
 
 	uow.Commit()
 
-	self := &query{
-		DB:        sqlxDB,
-		ModelType: reflect.TypeOf(entries[0]),
-		Option: queryOption{
-			Orders: make([]orderOption, 0),
-		},
-	}
+	self := newQuery(
+		sqlxDB,
+		reflect.TypeOf(testModel{}),
+	)
 	res, err := self.Where("age % 5 = ?", 0).Count()
 
 	underscore.Chain(entries).Each(func(r testModel, _ int) {
@@ -105,12 +90,10 @@ func Test_query_Count_有条件(t *testing.T) {
 }
 
 func Test_query_Order(t *testing.T) {
-	self := &query{
-		DB: sqlxDB,
-		Option: queryOption{
-			Orders: make([]orderOption, 0),
-		},
-	}
+	self := newQuery(
+		sqlxDB,
+		reflect.TypeOf(testModel{}),
+	)
 	self.Order("id", "name")
 	assert.Equal(t, self.Option, queryOption{
 		Orders: []orderOption{

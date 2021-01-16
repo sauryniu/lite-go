@@ -9,10 +9,7 @@ import (
 
 func Test_unitOfWork_Commit(t *testing.T) {
 	assert.NotNil(t, sqlxDB)
-	self := &unitOfWork{
-		DB:    sqlxDB,
-		Items: make([]unitOfWorkItem, 0),
-	}
+	self := newUnitOfWork(sqlxDB)
 
 	entry := testModel{
 		ID:   "id-1",
@@ -28,9 +25,7 @@ func Test_unitOfWork_Commit(t *testing.T) {
 }
 
 func Test_unitOfWork_RegisterAdd(t *testing.T) {
-	self := &unitOfWork{
-		Items: make([]unitOfWorkItem, 0),
-	}
+	self := newUnitOfWork(sqlxDB)
 
 	entry := testModel{
 		ID:   "id-1",
@@ -51,9 +46,7 @@ func Test_unitOfWork_RegisterAdd(t *testing.T) {
 }
 
 func Test_unitOfWork_RegisterRemove(t *testing.T) {
-	self := &unitOfWork{
-		Items: make([]unitOfWorkItem, 0),
-	}
+	self := newUnitOfWork(sqlxDB)
 
 	entry := testModel{
 		ID:   "id-2",
@@ -74,9 +67,7 @@ func Test_unitOfWork_RegisterRemove(t *testing.T) {
 }
 
 func Test_unitOfWork_RegisterSave(t *testing.T) {
-	self := &unitOfWork{
-		Items: make([]unitOfWorkItem, 0),
-	}
+	self := newUnitOfWork(sqlxDB)
 
 	entry := testModel{
 		ID:   "id-3",

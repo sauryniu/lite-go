@@ -8,11 +8,6 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-type whereOption struct {
-	Args []interface{}
-	SQL  string
-}
-
 type query struct {
 	DB        *sqlx.DB
 	ModelType reflect.Type
@@ -77,4 +72,14 @@ func (m *query) order(flag string, fields ...string) db.IQuery {
 		})
 	})
 	return m
+}
+
+func newQuery(sqlxDB *sqlx.DB, modelType reflect.Type) *query {
+	return &query{
+		DB:        sqlxDB,
+		ModelType: modelType,
+		Option: queryOption{
+			Orders: make([]orderOption, 0),
+		},
+	}
 }
