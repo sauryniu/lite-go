@@ -9,9 +9,7 @@ import (
 )
 
 var (
-	self = New(&redis.Options{
-		Addr: "127.0.0.1:6379",
-	})
+	self   = New("127.0.0.1", 6379, "")
 	client = redis.NewClient(&redis.Options{
 		Addr: "127.0.0.1:6379",
 	})
@@ -91,6 +89,58 @@ func Test_goRedis_Get_不存在(t *testing.T) {
 	res, err := self.Get(key)
 	assert.NoError(t, err)
 	assert.Empty(t, res)
+}
+
+func Test_goRedis_Publish_string(t *testing.T) {
+	channel := "Test_goRedis_Publish"
+	message := "hello"
+	sub := client.Subscribe(channel)
+
+	msg := make(chan *redis.Message)
+	go func() {
+		for {
+			select {
+			case msg <- <-sub.Channel():
+				sub.Close()
+			default:
+			}
+		}
+	}()
+
+	_, err := self.Publish(channel, message)
+	assert.NoError(t, err)
+
+	assert.Equal(
+		t,
+		(<-msg).Payload,
+		message,
+	)
+}
+
+func Test_goRedis_Publish_array(t *testing.T) {
+	channel := "Test_goRedis_Publish"
+	message := []int{1, 2, 3}
+	sub := client.Subscribe(channel)
+
+	msg := make(chan *redis.Message)
+	go func() {
+		for {
+			select {
+			case msg <- <-sub.Channel():
+				sub.Close()
+			default:
+			}
+		}
+	}()
+
+	_, err := self.Publish(channel, message)
+	assert.NoError(t, err)
+
+	assert.Equal(
+		t,
+		(<-msg).Payload,
+		"[1,2,3]",
+	)
 }
 
 func Test_goRedis_Set(t *testing.T) {
@@ -270,4 +320,32 @@ func Test_goRedis_Set_PX_XX(t *testing.T) {
 
 	_, err = client.Get(key).Result()
 	assert.Equal(t, err, redis.Nil)
+}
+
+func Test_goRedis_Subscribe(t *testing.T) {
+	channel := "Test_goRedis_Subscribe"
+	msg := make(chan *redis.Message)
+	self.Subscribe([]string{channel}, func(sub interface{}) {
+		for {
+			select {
+			case msg <- <-sub.(*redis.PubSub).Channel():
+				sub.(*redis.PubSub).Close()
+			default:
+			}
+		}
+	})
+
+	message := "hello"
+	count, err := client.Publish(channel, message).Result()
+	assert.NoError(t, err)
+	assert.Equal(
+		t,
+		count,
+		int64(1),
+	)
+	assert.Equal(
+		t,
+		(<-msg).Payload,
+		message,
+	)
 }

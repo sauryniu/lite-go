@@ -1,10 +1,13 @@
 package goredis
 
 import (
+	"fmt"
+	"reflect"
 	"time"
 
 	"github.com/ahl5esoft/lite-go/plugin/redisex"
 	"github.com/go-redis/redis"
+	jsoniter "github.com/json-iterator/go"
 )
 
 type goRedis struct {
@@ -43,6 +46,17 @@ func (m goRedis) Get(key string) (string, error) {
 	return res, nil
 }
 
+func (m goRedis) Publish(channel string, message interface{}) (int, error) {
+	var msg string
+	if reflect.TypeOf(message).Kind() == reflect.String {
+		msg = message.(string)
+	} else {
+		msg, _ = jsoniter.MarshalToString(message)
+	}
+	count, err := m.Client.Publish(channel, msg).Result()
+	return int(count), err
+}
+
 func (m goRedis) Set(key, value string, extraArgs ...interface{}) (ok bool, err error) {
 	var res string
 	if len(extraArgs) == 0 {
@@ -79,8 +93,9 @@ func (m goRedis) Set(key, value string, extraArgs ...interface{}) (ok bool, err 
 	return
 }
 
-func (m goRedis) SetNX(key, value string, expires time.Duration) (bool, error) {
-	return m.Client.SetNX(key, value, expires).Result()
+func (m goRedis) Subscribe(channels []string, handleAction func(sub interface{})) {
+	sub := m.Client.Subscribe(channels...)
+	go handleAction(sub)
 }
 
 func (m goRedis) Time() (time.Time, error) {
@@ -88,8 +103,11 @@ func (m goRedis) Time() (time.Time, error) {
 }
 
 // New is IRedis实例
-func New(options *redis.Options) redisex.IRedis {
+func New(host string, port int, password string) redisex.IRedis {
 	return &goRedis{
-		Client: redis.NewClient(options),
+		Client: redis.NewClient(&redis.Options{
+			Addr:     fmt.Sprintf("%s:%d", host, port),
+			Password: password,
+		}),
 	}
 }

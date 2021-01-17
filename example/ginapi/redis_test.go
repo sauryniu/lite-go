@@ -14,7 +14,6 @@ import (
 	"github.com/ahl5esoft/lite-go/plugin/redisex"
 	"github.com/ahl5esoft/lite-go/plugin/redisex/goredis"
 	"github.com/gin-gonic/gin"
-	"github.com/go-redis/redis"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/stretchr/testify/assert"
 )
@@ -32,9 +31,7 @@ func (m redisAPI) Call() (interface{}, error) {
 }
 
 func Test_Regis(t *testing.T) {
-	redisInstance := goredis.New(&redis.Options{
-		Addr: "127.0.0.1:6379",
-	})
+	redisInstance := goredis.New("127.0.0.1", 6379, "")
 	ioc.Set(redisex.IoCKey, redisInstance)
 
 	endpoint := "endpoint"

@@ -116,6 +116,21 @@ func (mr *MockIRedisMockRecorder) Get(arg0 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockIRedis)(nil).Get), arg0)
 }
 
+// Publish mocks base method
+func (m *MockIRedis) Publish(arg0 string, arg1 interface{}) (int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Publish", arg0, arg1)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Publish indicates an expected call of Publish
+func (mr *MockIRedisMockRecorder) Publish(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Publish", reflect.TypeOf((*MockIRedis)(nil).Publish), arg0, arg1)
+}
+
 // Set mocks base method
 func (m *MockIRedis) Set(arg0, arg1 string, arg2 ...interface{}) (bool, error) {
 	m.ctrl.T.Helper()
@@ -134,6 +149,18 @@ func (mr *MockIRedisMockRecorder) Set(arg0, arg1 interface{}, arg2 ...interface{
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Set", reflect.TypeOf((*MockIRedis)(nil).Set), varargs...)
+}
+
+// Subscribe mocks base method
+func (m *MockIRedis) Subscribe(channels []string, handleAction func(interface{})) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "Subscribe", channels, handleAction)
+}
+
+// Subscribe indicates an expected call of Subscribe
+func (mr *MockIRedisMockRecorder) Subscribe(channels, handleAction interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Subscribe", reflect.TypeOf((*MockIRedis)(nil).Subscribe), channels, handleAction)
 }
 
 // Time mocks base method

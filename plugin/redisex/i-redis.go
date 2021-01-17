@@ -12,6 +12,8 @@ type IRedis interface {
 	Exists(string) (bool, error)
 	Eval(string, []string, ...interface{}) (interface{}, error)
 	Get(string) (string, error)
+	Publish(string, interface{}) (int, error)
 	Set(string, string, ...interface{}) (bool, error)
+	Subscribe(channels []string, handleAction func(sub interface{}))
 	Time() (time.Time, error)
 }
