@@ -47,13 +47,13 @@ func (mr *MockIMQMockRecorder) Publish(channel, message interface{}) *gomock.Cal
 }
 
 // Subscribe mocks base method
-func (m *MockIMQ) Subscribe(channel string, callback func(string)) {
+func (m *MockIMQ) Subscribe(channel string, message chan<- string) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "Subscribe", channel, callback)
+	m.ctrl.Call(m, "Subscribe", channel, message)
 }
 
 // Subscribe indicates an expected call of Subscribe
-func (mr *MockIMQMockRecorder) Subscribe(channel, callback interface{}) *gomock.Call {
+func (mr *MockIMQMockRecorder) Subscribe(channel, message interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Subscribe", reflect.TypeOf((*MockIMQ)(nil).Subscribe), channel, callback)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Subscribe", reflect.TypeOf((*MockIMQ)(nil).Subscribe), channel, message)
 }

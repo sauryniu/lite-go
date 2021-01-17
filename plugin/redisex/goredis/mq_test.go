@@ -37,9 +37,7 @@ func Test_redisMQ_Subscribe(t *testing.T) {
 	message := "hello"
 
 	res := make(chan string)
-	NewMQ(self).Subscribe(channel, func(msg string) {
-		res <- msg
-	})
+	NewMQ(self).Subscribe(channel, res)
 
 	self.Publish(channel, message)
 

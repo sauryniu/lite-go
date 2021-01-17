@@ -15,12 +15,12 @@ func (m redisMQ) Publish(channel string, message interface{}) error {
 	return err
 }
 
-func (m redisMQ) Subscribe(channel string, callback func(message string)) {
+func (m redisMQ) Subscribe(channel string, message chan<- string) {
 	m.Redis.Subscribe([]string{channel}, func(sub interface{}) {
 		for {
 			select {
 			case msg := <-sub.(*redis.PubSub).Channel():
-				callback(msg.Payload)
+				message <- msg.Payload
 			default:
 			}
 		}
