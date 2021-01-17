@@ -5,7 +5,7 @@ go 1.15
 require (
 	github.com/ahl5esoft/golang-underscore v0.0.0-20201223060300-7d336251677f
 	github.com/gin-gonic/gin v1.6.3
-	github.com/go-playground/validator/v10 v10.4.1 // indirect
+	github.com/go-playground/validator/v10 v10.4.1
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/golang/mock v1.4.4

@@ -7,10 +7,12 @@ import (
 
 	"github.com/ahl5esoft/lite-go/api"
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 )
 
 // NewPostRunOption is post请求运行选项
 func NewPostRunOption() RunOption {
+	verify := validator.New()
 	return func(app *gin.Engine) {
 		app.POST(api.RouteRule, func(ctx *gin.Context) {
 			var rp api.RouteParam
@@ -44,7 +46,8 @@ func NewPostRunOption() RunOption {
 			}()
 
 			apiInstance := api.New(rp.Endpoint, rp.Name)
-			if err = ctx.ShouldBind(apiInstance); err != nil {
+			ctx.BindJSON(apiInstance)
+			if err = verify.Struct(apiInstance); err != nil {
 				err = api.NewError(api.VerifyErrorCode, "")
 				return
 			}
