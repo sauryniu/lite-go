@@ -1,13 +1,12 @@
 package cor
 
 type handler struct {
-	HandleFunc func(ctx interface{}) error
-
-	next IHandler
+	handleFunc func(ctx interface{}) error
+	next       IHandler
 }
 
 func (m handler) Handle(ctx interface{}) (err error) {
-	if err = m.HandleFunc(ctx); err != nil || m.next == nil {
+	if err = m.handleFunc(ctx); err != nil || m.next == nil {
 		return
 	}
 
@@ -26,6 +25,6 @@ func (m *handler) SetNext(handler IHandler) IHandler {
 // New is 创建IHandler
 func New(handleFunc func(ctx interface{}) error) IHandler {
 	return &handler{
-		HandleFunc: handleFunc,
+		handleFunc: handleFunc,
 	}
 }

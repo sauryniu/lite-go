@@ -8,12 +8,10 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type memoryEnv struct {
-	Memory map[string]interface{}
-}
+type memoryEnv map[string]interface{}
 
 func (m memoryEnv) Get(k string, v interface{}) {
-	if value, ok := m.Memory[k]; ok {
+	if value, ok := m[k]; ok {
 		reflect.ValueOf(v).Elem().Set(
 			reflect.ValueOf(value),
 		)
@@ -22,9 +20,7 @@ func (m memoryEnv) Get(k string, v interface{}) {
 
 // NewMemoryEnv is 创建内存IEnv
 func NewMemoryEnv(memory map[string]interface{}) IEnv {
-	return &memoryEnv{
-		Memory: memory,
-	}
+	return memoryEnv(memory)
 }
 
 // NewJSONFileEnv is 创建IEnv(json文件)
@@ -33,7 +29,7 @@ func NewJSONFileEnv(file ioex.IFile) IEnv {
 	file.Read(&bf)
 
 	env := new(memoryEnv)
-	json.Unmarshal(bf, &env.Memory)
+	json.Unmarshal(bf, &env)
 	return env
 }
 
@@ -43,6 +39,6 @@ func NewYamlFileEnv(file ioex.IFile) IEnv {
 	file.Read(&bf)
 
 	env := new(memoryEnv)
-	yaml.Unmarshal(bf, &env.Memory)
+	yaml.Unmarshal(bf, &env)
 	return env
 }

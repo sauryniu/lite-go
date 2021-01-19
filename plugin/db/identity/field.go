@@ -6,21 +6,21 @@ import (
 )
 
 type identityField struct {
-	Field      reflect.StructField
-	Name       string
-	StructName string
+	field      reflect.StructField
+	name       string
+	structName string
 }
 
 func (m identityField) GetName() string {
-	return m.Name
+	return m.name
 }
 
 func (m identityField) GetStructName() string {
-	return m.StructName
+	return m.structName
 }
 
 func (m identityField) GetValue(structValue reflect.Value) interface{} {
-	return structValue.FieldByIndex(m.Field.Index).Interface()
+	return structValue.FieldByIndex(m.field.Index).Interface()
 }
 
 // NewField is IField实例
@@ -41,8 +41,8 @@ func NewField(f reflect.StructField, identityType reflect.Type) IField {
 		}
 	}
 	return identityField{
-		Field:      f,
-		Name:       name,
-		StructName: structName,
+		field:      f,
+		name:       name,
+		structName: structName,
 	}
 }

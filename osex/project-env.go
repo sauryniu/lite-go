@@ -9,11 +9,12 @@ import (
 
 type projectEnv struct {
 	IEnv
-	Project string
+
+	project string
 }
 
 func (m projectEnv) Get(k string, v interface{}) {
-	k = strings.Join([]string{m.Project, k}, "-")
+	k = strings.Join([]string{m.project, k}, "-")
 	k = strings.Replace(k, "-", "_", -1)
 	m.IEnv.Get(k, v)
 }
@@ -23,6 +24,6 @@ func NewProjectEnv(ioFactory ioex.IFactory, env IEnv) IEnv {
 	wd, _ := os.Getwd()
 	return &projectEnv{
 		IEnv:    env,
-		Project: ioFactory.BuildDirectory(wd).GetName(),
+		project: ioFactory.BuildDirectory(wd).GetName(),
 	}
 }

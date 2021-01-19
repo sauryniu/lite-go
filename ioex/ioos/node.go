@@ -9,11 +9,11 @@ import (
 )
 
 type node struct {
-	Path string
+	path string
 }
 
 func (m node) GetName() string {
-	return filepath.Base(m.Path)
+	return filepath.Base(m.path)
 }
 
 func (m node) GetParent() ioex.IDirectory {
@@ -24,11 +24,11 @@ func (m node) GetParent() ioex.IDirectory {
 }
 
 func (m node) GetPath() string {
-	return m.Path
+	return m.path
 }
 
 func (m node) IsExist() bool {
-	_, err := os.Stat(m.Path)
+	_, err := os.Stat(m.path)
 	return err == nil || os.IsExist(err)
 }
 
@@ -62,6 +62,6 @@ func Build(pathArgs ...string) ioex.INode {
 
 func newNode(pathArgs ...string) ioex.INode {
 	return node{
-		Path: iopath.Join(pathArgs...),
+		path: iopath.Join(pathArgs...),
 	}
 }

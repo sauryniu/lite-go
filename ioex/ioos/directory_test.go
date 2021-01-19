@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/ahl5esoft/lite-go/ioex/iopath"
-
 	"github.com/stretchr/testify/assert"
 )
 

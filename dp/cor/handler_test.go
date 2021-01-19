@@ -8,8 +8,7 @@ import (
 )
 
 type testContext struct {
-	Count int
-
+	count   int
 	isBreak bool
 }
 
@@ -24,28 +23,28 @@ func (m testContext) IsBreak() bool {
 func Test_handler_Handle(t *testing.T) {
 	ctx := new(testContext)
 	err := New(func(ctx interface{}) error {
-		ctx.(*testContext).Count = 5
+		ctx.(*testContext).count = 5
 		return nil
 	}).Handle(ctx)
 	assert.NoError(t, err)
-	assert.Equal(t, ctx.Count, 5)
+	assert.Equal(t, ctx.count, 5)
 }
 
 func Test_handler_SetNext(t *testing.T) {
 	ctx := new(testContext)
 	h := New(func(ctx interface{}) error {
-		ctx.(*testContext).Count = 5
+		ctx.(*testContext).count = 5
 		return nil
 	})
 	h.SetNext(
 		New(func(ctx interface{}) error {
-			ctx.(*testContext).Count = ctx.(*testContext).Count + 10
+			ctx.(*testContext).count = ctx.(*testContext).count + 10
 			return nil
 		}),
 	)
 	err := h.Handle(ctx)
 	assert.NoError(t, err)
-	assert.Equal(t, ctx.Count, 15)
+	assert.Equal(t, ctx.count, 15)
 }
 
 func Test_handler_SetNext_第一个错误(t *testing.T) {
@@ -55,7 +54,7 @@ func Test_handler_SetNext_第一个错误(t *testing.T) {
 	})
 	h.SetNext(
 		New(func(ctx interface{}) error {
-			ctx.(*testContext).Count = 5
+			ctx.(*testContext).count = 5
 			return nil
 		}),
 	)
@@ -66,7 +65,7 @@ func Test_handler_SetNext_第一个错误(t *testing.T) {
 		err.Error(),
 		"err",
 	)
-	assert.Equal(t, ctx.Count, 0)
+	assert.Equal(t, ctx.count, 0)
 }
 
 func Test_handler_SetNext_第一个跳出(t *testing.T) {
@@ -77,19 +76,19 @@ func Test_handler_SetNext_第一个跳出(t *testing.T) {
 	})
 	h.SetNext(
 		New(func(ctx interface{}) error {
-			ctx.(*testContext).Count = 5
+			ctx.(*testContext).count = 5
 			return nil
 		}),
 	)
 	err := h.Handle(ctx)
 	assert.NoError(t, err)
-	assert.Equal(t, ctx.Count, 0)
+	assert.Equal(t, ctx.count, 0)
 }
 
 func Test_handler_SetNext_第二个错误(t *testing.T) {
 	ctx := new(testContext)
 	h := New(func(ctx interface{}) error {
-		ctx.(*testContext).Count = 5
+		ctx.(*testContext).count = 5
 		return nil
 	})
 	h.SetNext(
@@ -104,5 +103,5 @@ func Test_handler_SetNext_第二个错误(t *testing.T) {
 		err.Error(),
 		"err",
 	)
-	assert.Equal(t, ctx.Count, 5)
+	assert.Equal(t, ctx.count, 5)
 }

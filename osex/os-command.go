@@ -12,13 +12,16 @@ import (
 const expiredText = "执行超时"
 
 type osCommand struct {
-	Expires time.Duration
-
-	cmd *exec.Cmd
+	cmd     *exec.Cmd
+	dirPath string
+	expires time.Duration
 }
 
 func (m osCommand) Exec(name string, args ...string) (string, string, error) {
 	m.cmd = exec.Command(name, args...)
+	if m.dirPath != "" {
+		m.cmd.Dir = m.dirPath
+	}
 	errReader, err := m.cmd.StderrPipe()
 	if err != nil {
 		return "", "", err
@@ -39,12 +42,12 @@ func (m osCommand) Exec(name string, args ...string) (string, string, error) {
 }
 
 func (m *osCommand) SetDir(format string, args ...interface{}) ICommand {
-	m.cmd.Dir = fmt.Sprintf(format, args...)
+	m.dirPath = fmt.Sprintf(format, args...)
 	return m
 }
 
 func (m *osCommand) SetExpires(expires time.Duration) ICommand {
-	m.Expires = expires
+	m.expires = expires
 	return m
 }
 
@@ -64,7 +67,7 @@ func (m osCommand) exec(errReader, outReader io.ReadCloser) (string, string, err
 	case err := <-errChan:
 		close(errChan)
 		return "", "", err
-	case <-time.After(m.Expires):
+	case <-time.After(m.expires):
 		return "", expiredText, nil
 	case errStr := <-stderrChan:
 		close(stderrChan)
@@ -94,6 +97,6 @@ func (m osCommand) scan(reader io.ReadCloser, msg chan string) {
 // NewOSCommand is 创建ICommand
 func NewOSCommand() ICommand {
 	return &osCommand{
-		Expires: 4 * time.Second,
+		expires: 4 * time.Second,
 	}
 }

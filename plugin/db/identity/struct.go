@@ -10,10 +10,9 @@ import (
 var structTypeOfStruct = make(map[reflect.Type]IStruct)
 
 type identityStruct struct {
-	StructType reflect.Type
-
-	fields  []IField
-	idIndex int
+	fields     []IField
+	idIndex    int
+	structType reflect.Type
 }
 
 func (m *identityStruct) FindFields() []IField {
@@ -21,12 +20,12 @@ func (m *identityStruct) FindFields() []IField {
 		m.idIndex = -1
 		underscore.Range(
 			0,
-			m.StructType.NumField(),
+			m.structType.NumField(),
 			1,
 		).Map(func(r int, i int) IField {
 			c := NewField(
-				m.StructType.Field(r),
-				m.StructType,
+				m.structType.Field(r),
+				m.structType,
 			)
 			if c.GetStructName() != "" {
 				m.idIndex = i
@@ -43,7 +42,7 @@ func (m *identityStruct) GetIDField() (IField, error) {
 	if m.idIndex == -1 {
 		return nil, fmt.Errorf(
 			`缺少^db:"主键,表名"^: %s`,
-			m.StructType.Name(),
+			m.structType.Name(),
 		)
 	}
 
@@ -60,14 +59,14 @@ func (m *identityStruct) GetName() (string, error) {
 }
 
 func (m *identityStruct) GetType() reflect.Type {
-	return m.StructType
+	return m.structType
 }
 
 // NewStruct is IStruct实例
 func NewStruct(structType reflect.Type) IStruct {
 	if _, ok := structTypeOfStruct[structType]; !ok {
 		structTypeOfStruct[structType] = &identityStruct{
-			StructType: structType,
+			structType: structType,
 		}
 	}
 
