@@ -28,6 +28,32 @@ func Test_file_GetFile(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+func Test_file_Read_Bytes(t *testing.T) {
+	wd, err := os.Getwd()
+	assert.NoError(t, err)
+
+	file := NewFile(wd, "read.txt")
+	defer file.Remove()
+
+	f, err := file.GetFile()
+	assert.NoError(t, err)
+
+	defer f.Close()
+
+	text := "read string"
+	_, err = f.WriteString(text)
+	assert.NoError(t, err)
+
+	var res []byte
+	err = file.Read(&res)
+	assert.NoError(t, err)
+	assert.Equal(
+		t,
+		string(res),
+		text,
+	)
+}
+
 func Test_file_Read_JSON(t *testing.T) {
 	wd, err := os.Getwd()
 	assert.NoError(t, err)
@@ -58,32 +84,6 @@ func Test_file_Read_JSON(t *testing.T) {
 	)
 }
 
-func Test_file_Read_Bytes(t *testing.T) {
-	wd, err := os.Getwd()
-	assert.NoError(t, err)
-
-	file := NewFile(wd, "read.txt")
-	defer file.Remove()
-
-	f, err := file.GetFile()
-	assert.NoError(t, err)
-
-	defer f.Close()
-
-	text := "read string"
-	_, err = f.WriteString(text)
-	assert.NoError(t, err)
-
-	var res []byte
-	err = file.Read(&res)
-	assert.NoError(t, err)
-	assert.Equal(
-		t,
-		string(res),
-		text,
-	)
-}
-
 func Test_file_Read_String(t *testing.T) {
 	wd, err := os.Getwd()
 	assert.NoError(t, err)
@@ -104,6 +104,65 @@ func Test_file_Read_String(t *testing.T) {
 	err = file.Read(&res)
 	assert.NoError(t, err)
 	assert.Equal(t, res, text)
+}
+
+func Test_file_ReadJSON(t *testing.T) {
+	wd, err := os.Getwd()
+	assert.NoError(t, err)
+
+	file := NewFile(wd, "read-json.txt")
+	defer file.Remove()
+
+	f, err := file.GetFile()
+	assert.NoError(t, err)
+
+	defer f.Close()
+
+	text := `{"name":"n","age":11}`
+	_, err = f.WriteString(text)
+	assert.NoError(t, err)
+
+	type testStruct struct {
+		Name string
+		Age  int
+	}
+	var v testStruct
+	err = file.ReadJSON(&v)
+	assert.NoError(t, err)
+	assert.Equal(t, v, testStruct{
+		Name: "n",
+		Age:  11,
+	})
+}
+
+func Test_file_ReadYaml(t *testing.T) {
+	wd, err := os.Getwd()
+	assert.NoError(t, err)
+
+	file := NewFile(wd, "read-yaml.txt")
+	defer file.Remove()
+
+	f, err := file.GetFile()
+	assert.NoError(t, err)
+
+	defer f.Close()
+
+	text := `name: n
+age: 11`
+	_, err = f.WriteString(text)
+	assert.NoError(t, err)
+
+	type testStruct struct {
+		Name string
+		Age  int
+	}
+	var v testStruct
+	err = file.ReadYaml(&v)
+	assert.NoError(t, err)
+	assert.Equal(t, v, testStruct{
+		Name: "n",
+		Age:  11,
+	})
 }
 
 func Test_file_Write_String(t *testing.T) {

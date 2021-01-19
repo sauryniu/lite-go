@@ -160,6 +160,34 @@ func (mr *MockIFileMockRecorder) Read(data interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Read", reflect.TypeOf((*MockIFile)(nil).Read), data)
 }
 
+// ReadJSON mocks base method
+func (m *MockIFile) ReadJSON(data interface{}) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ReadJSON", data)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ReadJSON indicates an expected call of ReadJSON
+func (mr *MockIFileMockRecorder) ReadJSON(data interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReadJSON", reflect.TypeOf((*MockIFile)(nil).ReadJSON), data)
+}
+
+// ReadYaml mocks base method
+func (m *MockIFile) ReadYaml(data interface{}) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ReadYaml", data)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ReadYaml indicates an expected call of ReadYaml
+func (mr *MockIFileMockRecorder) ReadYaml(data interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReadYaml", reflect.TypeOf((*MockIFile)(nil).ReadYaml), data)
+}
+
 // Write mocks base method
 func (m *MockIFile) Write(data interface{}) error {
 	m.ctrl.T.Helper()

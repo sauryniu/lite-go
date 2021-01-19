@@ -1,9 +1,11 @@
 package osex
 
 import (
+	"os"
 	"testing"
 	"time"
 
+	"github.com/ahl5esoft/lite-go/ioex/ioos"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -19,10 +21,21 @@ func Test_osCommand_Exec(t *testing.T) {
 }
 
 func Test_osCommand_Exec_SetDir(t *testing.T) {
-	stdout, stderr, err := NewOSCommand().SetDir("d:/").SetExpires(0*time.Second).Exec("go", "version")
+	wd, _ := os.Getwd()
+	dir := ioos.NewDirectory(wd, "set-dir")
+	dir.Create()
+	defer dir.Remove()
+
+	_, _, err := NewOSCommand().SetDir(
+		dir.GetPath(),
+	).Exec("git", "init")
 	assert.NoError(t, err)
-	assert.Empty(t, stdout)
-	assert.Equal(t, stderr, expiredText)
+
+	ok := ioos.NewDirectory(
+		dir.GetPath(),
+		".git",
+	).IsExist()
+	assert.True(t, ok)
 }
 
 func Test_osCommand_Exec_过期(t *testing.T) {

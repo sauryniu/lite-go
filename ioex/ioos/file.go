@@ -1,6 +1,7 @@
 package ioos
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -8,6 +9,7 @@ import (
 	"reflect"
 
 	"github.com/ahl5esoft/lite-go/ioex"
+	"gopkg.in/yaml.v2"
 )
 
 type file struct {
@@ -64,6 +66,24 @@ func (m file) Read(v interface{}) error {
 		"不支持ioos.file.Read(%s)",
 		value.Type(),
 	)
+}
+
+func (m file) ReadJSON(data interface{}) error {
+	var bf []byte
+	if err := m.Read(&bf); err != nil {
+		return err
+	}
+
+	return json.Unmarshal(bf, data)
+}
+
+func (m file) ReadYaml(data interface{}) error {
+	var bf []byte
+	if err := m.Read(&bf); err != nil {
+		return err
+	}
+
+	return yaml.Unmarshal(bf, data)
 }
 
 func (m file) Write(data interface{}) error {

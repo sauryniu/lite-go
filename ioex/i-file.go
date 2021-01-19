@@ -9,5 +9,7 @@ type IFile interface {
 	GetExt() string
 	GetFile() (*os.File, error)
 	Read(data interface{}) error
+	ReadJSON(data interface{}) error
+	ReadYaml(data interface{}) error
 	Write(data interface{}) error
 }
