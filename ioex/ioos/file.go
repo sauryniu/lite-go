@@ -1,7 +1,6 @@
 package ioos
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -59,10 +58,12 @@ func (m file) Read(v interface{}) error {
 	} else if value.Kind() == reflect.Slice && value.Type().Elem().Kind() == reflect.Uint8 {
 		value.SetBytes(bf)
 		return nil
-	} else {
-		err = json.Unmarshal(bf, v)
-		return err
 	}
+
+	return fmt.Errorf(
+		"不支持ioos.file.Read(%s)",
+		value.Type(),
+	)
 }
 
 func (m file) Write(data interface{}) error {

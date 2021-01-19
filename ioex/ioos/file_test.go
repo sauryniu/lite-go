@@ -50,16 +50,11 @@ func Test_file_Read_JSON(t *testing.T) {
 	}
 	var v testStruct
 	err = file.Read(&v)
-	assert.NoError(t, err)
+	assert.Error(t, err)
 	assert.Equal(
 		t,
-		v.Name,
-		"n",
-	)
-	assert.Equal(
-		t,
-		v.Age,
-		11,
+		err.Error(),
+		"不支持ioos.file.Read(ioos.testStruct)",
 	)
 }
 
