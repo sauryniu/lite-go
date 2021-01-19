@@ -6,16 +6,16 @@ type handler struct {
 	next IHandler
 }
 
-func (m handler) Handle(ctx interface{}) error {
-	if err := m.HandleFunc(ctx); err != nil {
-		return err
+func (m handler) Handle(ctx interface{}) (err error) {
+	if err = m.HandleFunc(ctx); err != nil || m.next == nil {
+		return
 	}
 
-	if m.next != nil {
-		return m.next.Handle(ctx)
+	if breakable, ok := ctx.(IBreakable); ok && breakable.IsBreak() {
+		return
 	}
 
-	return nil
+	return m.next.Handle(ctx)
 }
 
 func (m *handler) SetNext(handler IHandler) IHandler {

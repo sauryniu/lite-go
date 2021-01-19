@@ -9,6 +9,16 @@ import (
 
 type testContext struct {
 	Count int
+
+	isBreak bool
+}
+
+func (m *testContext) Break() {
+	m.isBreak = true
+}
+
+func (m testContext) IsBreak() bool {
+	return m.isBreak
 }
 
 func Test_handler_Handle(t *testing.T) {
@@ -38,7 +48,7 @@ func Test_handler_SetNext(t *testing.T) {
 	assert.Equal(t, ctx.Count, 15)
 }
 
-func Test_handler_SetNext_first_error(t *testing.T) {
+func Test_handler_SetNext_第一个错误(t *testing.T) {
 	ctx := new(testContext)
 	h := New(func(ctx interface{}) error {
 		return errors.New("err")
@@ -59,7 +69,24 @@ func Test_handler_SetNext_first_error(t *testing.T) {
 	assert.Equal(t, ctx.Count, 0)
 }
 
-func Test_handler_SetNext_second_error(t *testing.T) {
+func Test_handler_SetNext_第一个跳出(t *testing.T) {
+	ctx := new(testContext)
+	h := New(func(ctx interface{}) error {
+		ctx.(*testContext).Break()
+		return nil
+	})
+	h.SetNext(
+		New(func(ctx interface{}) error {
+			ctx.(*testContext).Count = 5
+			return nil
+		}),
+	)
+	err := h.Handle(ctx)
+	assert.NoError(t, err)
+	assert.Equal(t, ctx.Count, 0)
+}
+
+func Test_handler_SetNext_第二个错误(t *testing.T) {
 	ctx := new(testContext)
 	h := New(func(ctx interface{}) error {
 		ctx.(*testContext).Count = 5
