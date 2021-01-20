@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	self   = New("127.0.0.1", 6379, "")
+	self   = New("127.0.0.1", 6379)
 	client = redis.NewClient(&redis.Options{
 		Addr: "127.0.0.1:6379",
 	})
@@ -325,12 +325,11 @@ func Test_goRedis_Set_PX_XX(t *testing.T) {
 func Test_goRedis_Subscribe(t *testing.T) {
 	channel := "Test_goRedis_Subscribe"
 	msg := make(chan *redis.Message)
-	self.Subscribe([]string{channel}, func(sub interface{}) {
+	New("127.0.0.1", 6379).Subscribe([]string{channel}, func(sub interface{}) {
 		for {
 			select {
 			case msg <- <-sub.(*redis.PubSub).Channel():
 				sub.(*redis.PubSub).Close()
-			default:
 			}
 		}
 	})

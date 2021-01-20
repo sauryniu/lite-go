@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"time"
 
+	underscore "github.com/ahl5esoft/golang-underscore"
 	"github.com/ahl5esoft/lite-go/plugin/redisex"
 	"github.com/go-redis/redis"
 	jsoniter "github.com/json-iterator/go"
@@ -103,11 +104,14 @@ func (m goRedis) Time() (time.Time, error) {
 }
 
 // New is IRedis实例
-func New(host string, port int, password string) redisex.IRedis {
+func New(host string, port int, options ...redisex.Option) redisex.IRedis {
+	opt := &redis.Options{
+		Addr: fmt.Sprintf("%s:%d", host, port),
+	}
+	underscore.Chain(options).Each(func(r redisex.Option, _ int) {
+		r(opt)
+	})
 	return &goRedis{
-		Client: redis.NewClient(&redis.Options{
-			Addr:     fmt.Sprintf("%s:%d", host, port),
-			Password: password,
-		}),
+		Client: redis.NewClient(opt),
 	}
 }
