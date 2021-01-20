@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/ahl5esoft/lite-go/api"
+	"github.com/ahl5esoft/lite-go/errorex"
 	"github.com/ahl5esoft/lite-go/plugin/ginex"
 	"github.com/gin-gonic/gin"
 	jsoniter "github.com/json-iterator/go"
@@ -15,7 +16,7 @@ import (
 )
 
 type verifyAPI struct {
-	Name string `binding:"min=1,max=5,required" json:"na"`
+	Name string `validate:"min=1,max=5,required" json:"na"`
 }
 
 func (m verifyAPI) Call() (interface{}, error) {
@@ -71,7 +72,7 @@ func Test_Verify_Fail(t *testing.T) {
 
 	res, _ := jsoniter.MarshalToString(api.Response{
 		Data:  "",
-		Error: api.VerifyErrorCode,
+		Error: errorex.VerifyCode,
 	})
 	assert.JSONEq(
 		t,

@@ -6,6 +6,7 @@ import (
 	"runtime/debug"
 
 	"github.com/ahl5esoft/lite-go/api"
+	"github.com/ahl5esoft/lite-go/errorex"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 )
@@ -32,13 +33,13 @@ func NewPostRunOption() RunOption {
 				}
 
 				if err != nil {
-					if cErr, ok := err.(api.CustomError); ok {
+					if cErr, ok := err.(errorex.Custom); ok {
 						resp.Error = cErr.Code
 						resp.Data = cErr.Error()
 					} else {
 						fmt.Println(err)
 						debug.PrintStack()
-						resp.Error = api.PanicErrorCode
+						resp.Error = errorex.PanicCode
 					}
 				}
 
@@ -48,7 +49,7 @@ func NewPostRunOption() RunOption {
 			apiInstance := api.New(rp.Endpoint, rp.Name)
 			ctx.BindJSON(apiInstance)
 			if err = verify.Struct(apiInstance); err != nil {
-				err = api.NewError(api.VerifyErrorCode, "")
+				err = errorex.New(errorex.VerifyCode, "")
 				return
 			}
 

@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/ahl5esoft/lite-go/api"
+	"github.com/ahl5esoft/lite-go/errorex"
 	"github.com/ahl5esoft/lite-go/plugin/ginex"
 	"github.com/gin-gonic/gin"
 	jsoniter "github.com/json-iterator/go"
@@ -39,7 +40,7 @@ func Test_Panic(t *testing.T) {
 
 	res, _ := jsoniter.MarshalToString(api.Response{
 		Data:  "",
-		Error: api.PanicErrorCode,
+		Error: errorex.PanicCode,
 	})
 	assert.JSONEq(
 		t,
