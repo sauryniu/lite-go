@@ -9,20 +9,18 @@ import (
 )
 
 type connectPool struct {
-	Ctx         context.Context
-	Name        string
-	Collections map[string]*mongo.Collection
-	URI         string
-
-	client *mongo.Client
-	db     *mongo.Database
+	client      *mongo.Client
+	ctx         context.Context
+	collections map[string]*mongo.Collection
+	db          *mongo.Database
+	dbName      string
+	option      *options.ClientOptions
 }
 
 func (m *connectPool) GetClient() (*mongo.Client, error) {
 	if m.client == nil {
-		opt := options.Client().ApplyURI(m.URI)
 		var err error
-		m.client, err = mongo.Connect(m.Ctx, opt)
+		m.client, err = mongo.Connect(m.ctx, m.option)
 		if err != nil {
 			return nil, err
 		}
@@ -36,16 +34,16 @@ func (m *connectPool) GetCollection(s identity.IStruct) (*mongo.Collection, erro
 		return nil, err
 	}
 
-	if _, ok := m.Collections[name]; !ok {
+	if _, ok := m.collections[name]; !ok {
 		db, err := m.GetDb()
 		if err != nil {
 			return nil, err
 		}
 
-		m.Collections[name] = db.Collection(name)
+		m.collections[name] = db.Collection(name)
 	}
 
-	return m.Collections[name], nil
+	return m.collections[name], nil
 }
 
 func (m *connectPool) GetDb() (*mongo.Database, error) {
@@ -55,17 +53,17 @@ func (m *connectPool) GetDb() (*mongo.Database, error) {
 			return nil, err
 		}
 
-		m.db = client.Database(m.Name)
+		m.db = client.Database(m.dbName)
 	}
 
 	return m.db, nil
 }
 
-func newPool(name string, uri string) *connectPool {
+func newPool(uri, name string) *connectPool {
 	return &connectPool{
-		Collections: make(map[string]*mongo.Collection),
-		Ctx:         context.Background(),
-		Name:        name,
-		URI:         uri,
+		collections: make(map[string]*mongo.Collection),
+		ctx:         context.Background(),
+		dbName:      name,
+		option:      options.Client().ApplyURI(uri),
 	}
 }

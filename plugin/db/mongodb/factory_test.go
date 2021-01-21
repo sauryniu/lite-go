@@ -7,10 +7,7 @@ import (
 )
 
 func Test_factory_Db(t *testing.T) {
-	f, err := New(FactoryOption{
-		DbName: "lite-go",
-		URI:    "mongodb://localhost:27017",
-	})
+	f, err := New(uri, dbName)
 	assert.NoError(t, err)
 
 	var res []testModel
@@ -23,12 +20,9 @@ func Test_factory_Uow(t *testing.T) {
 	db, err := pool.GetDb()
 	assert.NoError(t, err)
 
-	defer db.Drop(pool.Ctx)
+	defer db.Drop(pool.ctx)
 
-	f, err := New(FactoryOption{
-		DbName: "lite-go",
-		URI:    "mongodb://localhost:27017",
-	})
+	f, err := New(uri, dbName)
 	assert.NoError(t, err)
 
 	uow := f.Uow()
@@ -49,12 +43,9 @@ func Test_factory_Uow_Commit(t *testing.T) {
 	db, err := pool.GetDb()
 	assert.NoError(t, err)
 
-	defer db.Drop(pool.Ctx)
+	defer db.Drop(pool.ctx)
 
-	f, err := New(FactoryOption{
-		DbName: "lite-go",
-		URI:    "mongodb://localhost:27017",
-	})
+	f, err := New(uri, dbName)
 	assert.NoError(t, err)
 
 	uow := f.Uow()

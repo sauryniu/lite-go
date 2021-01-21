@@ -10,19 +10,19 @@ import (
 )
 
 type unitOfWork struct {
-	AddQueue    []identity.IIdentity
-	Pool        *connectPool
-	RemoveQueue []identity.IIdentity
-	SaveQueue   []identity.IIdentity
+	addQueue    []identity.IIdentity
+	pool        *connectPool
+	removeQueue []identity.IIdentity
+	saveQueue   []identity.IIdentity
 }
 
 func (m *unitOfWork) Commit() error {
-	client, err := m.Pool.GetClient()
+	client, err := m.pool.GetClient()
 	if err != nil {
 		return err
 	}
 
-	return client.UseSession(m.Pool.Ctx, func(ctx mongo.SessionContext) (err error) {
+	return client.UseSession(m.pool.ctx, func(ctx mongo.SessionContext) (err error) {
 		if err = m.commitAdd(ctx); err != nil {
 			return err
 		}
@@ -35,25 +35,13 @@ func (m *unitOfWork) Commit() error {
 	})
 }
 
-func (m *unitOfWork) RegisterAdd(entry identity.IIdentity) {
-	m.AddQueue = append(m.AddQueue, entry)
-}
-
-func (m *unitOfWork) RegisterRemove(entry identity.IIdentity) {
-	m.RemoveQueue = append(m.RemoveQueue, entry)
-}
-
-func (m *unitOfWork) RegisterSave(entry identity.IIdentity) {
-	m.SaveQueue = append(m.SaveQueue, entry)
-}
-
 func (m *unitOfWork) commitAdd(ctx mongo.SessionContext) (err error) {
-	underscore.Chain(m.AddQueue).Map(func(r identity.IIdentity, _ int) error {
+	underscore.Chain(m.addQueue).Map(func(r identity.IIdentity, _ int) error {
 		entryValue := reflect.ValueOf(r)
 		s := identity.NewStruct(
 			entryValue.Type(),
 		)
-		col, rErr := m.Pool.GetCollection(s)
+		col, rErr := m.pool.GetCollection(s)
 		if rErr != nil {
 			return rErr
 		}
@@ -69,17 +57,17 @@ func (m *unitOfWork) commitAdd(ctx mongo.SessionContext) (err error) {
 	}).Find(func(r error, _ int) bool {
 		return r != nil
 	}).Value(&err)
-	m.AddQueue = make([]identity.IIdentity, 0)
+	m.addQueue = make([]identity.IIdentity, 0)
 	return
 }
 
 func (m *unitOfWork) commitRemove(ctx mongo.SessionContext) (err error) {
-	underscore.Chain(m.RemoveQueue).Map(func(r identity.IIdentity, _ int) error {
+	underscore.Chain(m.removeQueue).Map(func(r identity.IIdentity, _ int) error {
 		entryValue := reflect.ValueOf(r)
 		s := identity.NewStruct(
 			entryValue.Type(),
 		)
-		col, rErr := m.Pool.GetCollection(s)
+		col, rErr := m.pool.GetCollection(s)
 		if rErr != nil {
 			return rErr
 		}
@@ -96,17 +84,17 @@ func (m *unitOfWork) commitRemove(ctx mongo.SessionContext) (err error) {
 	}).Find(func(r error, _ int) bool {
 		return r != nil
 	}).Value(&err)
-	m.RemoveQueue = make([]identity.IIdentity, 0)
+	m.removeQueue = make([]identity.IIdentity, 0)
 	return
 }
 
 func (m *unitOfWork) commitSave(ctx mongo.SessionContext) (err error) {
-	underscore.Chain(m.SaveQueue).Map(func(r identity.IIdentity, _ int) error {
+	underscore.Chain(m.saveQueue).Map(func(r identity.IIdentity, _ int) error {
 		entryValue := reflect.ValueOf(r)
 		s := identity.NewStruct(
 			entryValue.Type(),
 		)
-		col, rErr := m.Pool.GetCollection(s)
+		col, rErr := m.pool.GetCollection(s)
 		if rErr != nil {
 			return rErr
 		}
@@ -128,15 +116,27 @@ func (m *unitOfWork) commitSave(ctx mongo.SessionContext) (err error) {
 	}).Find(func(r error, _ int) bool {
 		return r != nil
 	}).Value(&err)
-	m.SaveQueue = make([]identity.IIdentity, 0)
+	m.saveQueue = make([]identity.IIdentity, 0)
 	return
+}
+
+func (m *unitOfWork) registerAdd(entry identity.IIdentity) {
+	m.addQueue = append(m.addQueue, entry)
+}
+
+func (m *unitOfWork) registerRemove(entry identity.IIdentity) {
+	m.removeQueue = append(m.removeQueue, entry)
+}
+
+func (m *unitOfWork) registerSave(entry identity.IIdentity) {
+	m.saveQueue = append(m.saveQueue, entry)
 }
 
 func newUnitOfWork(pool *connectPool) *unitOfWork {
 	return &unitOfWork{
-		AddQueue:    make([]identity.IIdentity, 0),
-		Pool:        pool,
-		RemoveQueue: make([]identity.IIdentity, 0),
-		SaveQueue:   make([]identity.IIdentity, 0),
+		addQueue:    make([]identity.IIdentity, 0),
+		pool:        pool,
+		removeQueue: make([]identity.IIdentity, 0),
+		saveQueue:   make([]identity.IIdentity, 0),
 	}
 }

@@ -10,7 +10,7 @@ func Test_repository_Add(t *testing.T) {
 	db, err := pool.GetDb()
 	assert.NoError(t, err)
 
-	defer db.Drop(pool.Ctx)
+	defer db.Drop(pool.ctx)
 
 	uow := newUnitOfWork(pool)
 	entry := testModel{
@@ -34,7 +34,7 @@ func Test_repository_Add_WithTx(t *testing.T) {
 	db, err := pool.GetDb()
 	assert.NoError(t, err)
 
-	defer db.Drop(pool.Ctx)
+	defer db.Drop(pool.ctx)
 
 	uow := newUnitOfWork(pool)
 	entry := testModel{
@@ -54,7 +54,7 @@ func Test_repository_Query(t *testing.T) {
 	db, err := pool.GetDb()
 	assert.NoError(t, err)
 
-	defer db.Drop(pool.Ctx)
+	defer db.Drop(pool.ctx)
 
 	var res []testModel
 	err = newQuery(pool, testStruct).ToArray(&res)
@@ -66,7 +66,7 @@ func Test_repository_Remove(t *testing.T) {
 	db, err := pool.GetDb()
 	assert.NoError(t, err)
 
-	defer db.Drop(pool.Ctx)
+	defer db.Drop(pool.ctx)
 
 	uow := newUnitOfWork(pool)
 	entry := testModel{
@@ -74,7 +74,7 @@ func Test_repository_Remove(t *testing.T) {
 		Name: "1",
 		Age:  1,
 	}
-	uow.RegisterAdd(entry)
+	uow.registerAdd(entry)
 	err = uow.Commit()
 	assert.NoError(t, err)
 
@@ -90,7 +90,7 @@ func Test_repository_Remove_WithTx(t *testing.T) {
 	db, err := pool.GetDb()
 	assert.NoError(t, err)
 
-	defer db.Drop(pool.Ctx)
+	defer db.Drop(pool.ctx)
 
 	uow := newUnitOfWork(pool)
 	entry := testModel{
@@ -98,7 +98,7 @@ func Test_repository_Remove_WithTx(t *testing.T) {
 		Name: "1",
 		Age:  1,
 	}
-	uow.RegisterAdd(entry)
+	uow.registerAdd(entry)
 	err = uow.Commit()
 	assert.NoError(t, err)
 
@@ -118,7 +118,7 @@ func Test_repository_Save(t *testing.T) {
 	db, err := pool.GetDb()
 	assert.NoError(t, err)
 
-	defer db.Drop(pool.Ctx)
+	defer db.Drop(pool.ctx)
 
 	uow := newUnitOfWork(pool)
 	entry := testModel{
@@ -126,7 +126,7 @@ func Test_repository_Save(t *testing.T) {
 		Name: "1",
 		Age:  1,
 	}
-	uow.RegisterAdd(entry)
+	uow.registerAdd(entry)
 	err = uow.Commit()
 	assert.NoError(t, err)
 
@@ -151,7 +151,7 @@ func Test_repository_Save_WithTx(t *testing.T) {
 	db, err := pool.GetDb()
 	assert.NoError(t, err)
 
-	defer db.Drop(pool.Ctx)
+	defer db.Drop(pool.ctx)
 
 	uow := newUnitOfWork(pool)
 	entry := testModel{
@@ -159,7 +159,7 @@ func Test_repository_Save_WithTx(t *testing.T) {
 		Name: "1",
 		Age:  1,
 	}
-	uow.RegisterAdd(entry)
+	uow.registerAdd(entry)
 	err = uow.Commit()
 	assert.NoError(t, err)
 

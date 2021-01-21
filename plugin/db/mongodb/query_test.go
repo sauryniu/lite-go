@@ -21,7 +21,7 @@ func Test_query_Count_Where(t *testing.T) {
 	db, err := pool.GetDb()
 	assert.NoError(t, err)
 
-	defer db.Drop(pool.Ctx)
+	defer db.Drop(pool.ctx)
 
 	uow := newUnitOfWork(pool)
 	entry1 := testModel{
@@ -29,13 +29,13 @@ func Test_query_Count_Where(t *testing.T) {
 		Name: "1",
 		Age:  1,
 	}
-	uow.RegisterAdd(entry1)
+	uow.registerAdd(entry1)
 	entry2 := testModel{
 		ID:   "id2",
 		Name: "2",
 		Age:  2,
 	}
-	uow.RegisterAdd(entry2)
+	uow.registerAdd(entry2)
 	err = uow.Commit()
 	assert.NoError(t, err)
 
@@ -54,7 +54,7 @@ func Test_query_ToArray(t *testing.T) {
 	db, err := pool.GetDb()
 	assert.NoError(t, err)
 
-	defer db.Drop(pool.Ctx)
+	defer db.Drop(pool.ctx)
 
 	uow := newUnitOfWork(pool)
 	entry1 := testModel{
@@ -62,13 +62,13 @@ func Test_query_ToArray(t *testing.T) {
 		Name: "1",
 		Age:  1,
 	}
-	uow.RegisterAdd(entry1)
+	uow.registerAdd(entry1)
 	entry2 := testModel{
 		ID:   "id2",
 		Name: "2",
 		Age:  2,
 	}
-	uow.RegisterAdd(entry2)
+	uow.registerAdd(entry2)
 	err = uow.Commit()
 	assert.NoError(t, err)
 
@@ -86,7 +86,7 @@ func Test_query_ToArray_Order(t *testing.T) {
 	db, err := pool.GetDb()
 	assert.NoError(t, err)
 
-	defer db.Drop(pool.Ctx)
+	defer db.Drop(pool.ctx)
 
 	uow := newUnitOfWork(pool)
 	entry2 := testModel{
@@ -94,13 +94,13 @@ func Test_query_ToArray_Order(t *testing.T) {
 		Name: "2",
 		Age:  2,
 	}
-	uow.RegisterAdd(entry2)
+	uow.registerAdd(entry2)
 	entry1 := testModel{
 		ID:   "id1",
 		Name: "1",
 		Age:  1,
 	}
-	uow.RegisterAdd(entry1)
+	uow.registerAdd(entry1)
 	err = uow.Commit()
 	assert.NoError(t, err)
 
@@ -118,7 +118,7 @@ func Test_query_ToArray_OrderByDesc(t *testing.T) {
 	db, err := pool.GetDb()
 	assert.NoError(t, err)
 
-	defer db.Drop(pool.Ctx)
+	defer db.Drop(pool.ctx)
 
 	uow := newUnitOfWork(pool)
 	entry1 := testModel{
@@ -126,13 +126,13 @@ func Test_query_ToArray_OrderByDesc(t *testing.T) {
 		Name: "1",
 		Age:  1,
 	}
-	uow.RegisterAdd(entry1)
+	uow.registerAdd(entry1)
 	entry2 := testModel{
 		ID:   "id2",
 		Name: "2",
 		Age:  2,
 	}
-	uow.RegisterAdd(entry2)
+	uow.registerAdd(entry2)
 	err = uow.Commit()
 	assert.NoError(t, err)
 
@@ -150,7 +150,7 @@ func Test_query_ToArray_Skip(t *testing.T) {
 	db, err := pool.GetDb()
 	assert.NoError(t, err)
 
-	defer db.Drop(pool.Ctx)
+	defer db.Drop(pool.ctx)
 
 	uow := newUnitOfWork(pool)
 	entry1 := testModel{
@@ -158,13 +158,13 @@ func Test_query_ToArray_Skip(t *testing.T) {
 		Name: "1",
 		Age:  1,
 	}
-	uow.RegisterAdd(entry1)
+	uow.registerAdd(entry1)
 	entry2 := testModel{
 		ID:   "id2",
 		Name: "2",
 		Age:  2,
 	}
-	uow.RegisterAdd(entry2)
+	uow.registerAdd(entry2)
 	err = uow.Commit()
 	assert.NoError(t, err)
 
@@ -182,7 +182,7 @@ func Test_query_ToArray_Take(t *testing.T) {
 	db, err := pool.GetDb()
 	assert.NoError(t, err)
 
-	defer db.Drop(pool.Ctx)
+	defer db.Drop(pool.ctx)
 
 	uow := newUnitOfWork(pool)
 	entry1 := testModel{
@@ -190,13 +190,13 @@ func Test_query_ToArray_Take(t *testing.T) {
 		Name: "1",
 		Age:  1,
 	}
-	uow.RegisterAdd(entry1)
+	uow.registerAdd(entry1)
 	entry2 := testModel{
 		ID:   "id2",
 		Name: "2",
 		Age:  2,
 	}
-	uow.RegisterAdd(entry2)
+	uow.registerAdd(entry2)
 	err = uow.Commit()
 	assert.NoError(t, err)
 
@@ -214,7 +214,7 @@ func Test_query_ToArray_Where(t *testing.T) {
 	db, err := pool.GetDb()
 	assert.NoError(t, err)
 
-	defer db.Drop(pool.Ctx)
+	defer db.Drop(pool.ctx)
 
 	uow := newUnitOfWork(pool)
 	entry1 := testModel{
@@ -222,13 +222,13 @@ func Test_query_ToArray_Where(t *testing.T) {
 		Name: "1",
 		Age:  1,
 	}
-	uow.RegisterAdd(entry1)
+	uow.registerAdd(entry1)
 	entry2 := testModel{
 		ID:   "id2",
 		Name: "2",
 		Age:  2,
 	}
-	uow.RegisterAdd(entry2)
+	uow.registerAdd(entry2)
 	err = uow.Commit()
 	assert.NoError(t, err)
 

@@ -8,14 +8,8 @@ import (
 	"github.com/ahl5esoft/lite-go/plugin/db/identity"
 )
 
-// FactoryOption is 工厂选项
-type FactoryOption struct {
-	DbName string
-	URI    string
-}
-
 type factory struct {
-	Pool *connectPool
+	pool *connectPool
 }
 
 func (m factory) Db(entry identity.IIdentity, extra ...interface{}) db.IRepository {
@@ -32,24 +26,24 @@ func (m factory) Db(entry identity.IIdentity, extra ...interface{}) db.IReposito
 		uow = m.Uow().(*unitOfWork)
 	}
 
-	s := identity.NewStruct(
+	modelStruct := identity.NewStruct(
 		reflect.TypeOf(entry),
 	)
-	return newRepository(m.Pool, s, uow, isTx)
+	return newRepository(m.pool, modelStruct, uow, isTx)
 }
 
 func (m factory) Uow() db.IUnitOfWork {
-	return newUnitOfWork(m.Pool)
+	return newUnitOfWork(m.pool)
 }
 
 // New is 创建db.IDbFactory
-func New(opt FactoryOption) (db.IFactory, error) {
-	pool := newPool(opt.DbName, opt.URI)
+func New(uri, dbName string) (db.IFactory, error) {
+	pool := newPool(uri, dbName)
 	if _, err := pool.GetClient(); err != nil {
 		return nil, err
 	}
 
 	return &factory{
-		Pool: pool,
+		pool: pool,
 	}, nil
 }

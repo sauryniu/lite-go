@@ -6,51 +6,51 @@ import (
 )
 
 type repository struct {
-	IsTx   bool
-	Pool   *connectPool
-	Struct identity.IStruct
-	Uow    *unitOfWork
+	isTx        bool
+	modelStruct identity.IStruct
+	pool        *connectPool
+	uow         *unitOfWork
 }
 
 func (m repository) Add(entry identity.IIdentity) error {
-	m.Uow.RegisterAdd(entry)
+	m.uow.registerAdd(entry)
 
-	if m.IsTx {
+	if m.isTx {
 		return nil
 	}
 
-	return m.Uow.Commit()
+	return m.uow.Commit()
 }
 
 func (m repository) Query() db.IQuery {
-	return newQuery(m.Pool, m.Struct)
+	return newQuery(m.pool, m.modelStruct)
 }
 
 func (m repository) Remove(entry identity.IIdentity) error {
-	m.Uow.RegisterRemove(entry)
+	m.uow.registerRemove(entry)
 
-	if m.IsTx {
+	if m.isTx {
 		return nil
 	}
 
-	return m.Uow.Commit()
+	return m.uow.Commit()
 }
 
 func (m repository) Save(entry identity.IIdentity) error {
-	m.Uow.RegisterSave(entry)
+	m.uow.registerSave(entry)
 
-	if m.IsTx {
+	if m.isTx {
 		return nil
 	}
 
-	return m.Uow.Commit()
+	return m.uow.Commit()
 }
 
-func newRepository(pool *connectPool, s identity.IStruct, uow *unitOfWork, isTx bool) db.IRepository {
+func newRepository(pool *connectPool, modelStruct identity.IStruct, uow *unitOfWork, isTx bool) db.IRepository {
 	return &repository{
-		IsTx:   isTx,
-		Pool:   pool,
-		Struct: s,
-		Uow:    uow,
+		isTx:        isTx,
+		modelStruct: modelStruct,
+		pool:        pool,
+		uow:         uow,
 	}
 }

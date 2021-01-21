@@ -8,46 +8,46 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-func Test_unitOfWork_RegisterAdd(t *testing.T) {
+func Test_unitOfWork_registerAdd(t *testing.T) {
 	entry := testModel{
 		ID:   "id",
 		Name: "add",
 		Age:  1,
 	}
 	uow := newUnitOfWork(pool)
-	uow.RegisterAdd(entry)
+	uow.registerAdd(entry)
 	assert.EqualValues(
 		t,
-		uow.AddQueue,
+		uow.addQueue,
 		[]identity.IIdentity{entry},
 	)
 }
 
-func Test_unitOfWork_RegisterAdd_WithCommit(t *testing.T) {
+func Test_unitOfWork_registerAdd_WithCommit(t *testing.T) {
 	entry := testModel{
 		ID:   "id",
 		Name: "add",
 		Age:  1,
 	}
 	uow := newUnitOfWork(pool)
-	uow.RegisterAdd(entry)
+	uow.registerAdd(entry)
 	err := uow.Commit()
 	assert.NoError(t, err)
-	assert.Len(t, uow.AddQueue, 0)
+	assert.Len(t, uow.addQueue, 0)
 
 	db, err := pool.GetDb()
 	assert.NoError(t, err)
 
-	defer db.Drop(pool.Ctx)
+	defer db.Drop(pool.ctx)
 
 	name, err := testStruct.GetName()
 	assert.NoError(t, err)
 
-	cur, err := db.Collection(name).Find(pool.Ctx, bson.D{})
+	cur, err := db.Collection(name).Find(pool.ctx, bson.D{})
 	assert.NoError(t, err)
 
 	entries := make([]testModel, 0)
-	for cur.Next(pool.Ctx) {
+	for cur.Next(pool.ctx) {
 		var temp testModel
 		err = cur.Decode(&temp)
 		assert.NoError(t, err)
@@ -62,47 +62,47 @@ func Test_unitOfWork_RegisterAdd_WithCommit(t *testing.T) {
 	)
 }
 
-func Test_unitOfWork_RegisterRemove(t *testing.T) {
+func Test_unitOfWork_registerRemove(t *testing.T) {
 	entry := testModel{
 		ID:   "id",
 		Name: "remove",
 		Age:  1,
 	}
 	uow := newUnitOfWork(pool)
-	uow.RegisterRemove(entry)
+	uow.registerRemove(entry)
 	assert.EqualValues(
 		t,
-		uow.RemoveQueue,
+		uow.removeQueue,
 		[]identity.IIdentity{entry},
 	)
 }
 
-func Test_unitOfWork_RegisterRemove_WithCommit(t *testing.T) {
+func Test_unitOfWork_registerRemove_WithCommit(t *testing.T) {
 	entry := testModel{
 		ID:   "id",
 		Name: "remove",
 		Age:  1,
 	}
 	uow := newUnitOfWork(pool)
-	uow.RegisterAdd(entry)
-	uow.RegisterRemove(entry)
+	uow.registerAdd(entry)
+	uow.registerRemove(entry)
 	err := uow.Commit()
 	assert.NoError(t, err)
-	assert.Len(t, uow.RemoveQueue, 0)
+	assert.Len(t, uow.removeQueue, 0)
 
 	db, err := pool.GetDb()
 	assert.NoError(t, err)
 
-	defer db.Drop(pool.Ctx)
+	defer db.Drop(pool.ctx)
 
 	name, err := testStruct.GetName()
 	assert.NoError(t, err)
 
-	cur, err := db.Collection(name).Find(pool.Ctx, bson.D{})
+	cur, err := db.Collection(name).Find(pool.ctx, bson.D{})
 	assert.NoError(t, err)
 
 	entries := make([]testModel, 0)
-	for cur.Next(pool.Ctx) {
+	for cur.Next(pool.ctx) {
 		var temp testModel
 		err = cur.Decode(&temp)
 		assert.NoError(t, err)
@@ -113,24 +113,24 @@ func Test_unitOfWork_RegisterRemove_WithCommit(t *testing.T) {
 	assert.Len(t, entries, 0)
 }
 
-func Test_unitOfWork_RegisterSave(t *testing.T) {
+func Test_unitOfWork_registerSave(t *testing.T) {
 	uow := newUnitOfWork(pool)
 	entry := testModel{
 		ID:   "id-2",
 		Name: "save",
 		Age:  2,
 	}
-	uow.RegisterSave(entry)
+	uow.registerSave(entry)
 	assert.EqualValues(
 		t,
-		uow.SaveQueue,
+		uow.saveQueue,
 		[]identity.IIdentity{entry},
 	)
 }
 
-func Test_unitOfWork_RegisterSave_WithCommit(t *testing.T) {
+func Test_unitOfWork_registerSave_WithCommit(t *testing.T) {
 	uow := newUnitOfWork(pool)
-	uow.RegisterAdd(testModel{
+	uow.registerAdd(testModel{
 		ID:   "id-2",
 		Name: "add",
 		Age:  1,
@@ -140,24 +140,24 @@ func Test_unitOfWork_RegisterSave_WithCommit(t *testing.T) {
 		Name: "save",
 		Age:  2,
 	}
-	uow.RegisterSave(entry)
+	uow.registerSave(entry)
 	err := uow.Commit()
 	assert.NoError(t, err)
-	assert.Len(t, uow.SaveQueue, 0)
+	assert.Len(t, uow.saveQueue, 0)
 
 	db, err := pool.GetDb()
 	assert.NoError(t, err)
 
-	defer db.Drop(pool.Ctx)
+	defer db.Drop(pool.ctx)
 
 	name, err := testStruct.GetName()
 	assert.NoError(t, err)
 
-	cur, err := db.Collection(name).Find(pool.Ctx, bson.D{})
+	cur, err := db.Collection(name).Find(pool.ctx, bson.D{})
 	assert.NoError(t, err)
 
 	entries := make([]testModel, 0)
-	for cur.Next(pool.Ctx) {
+	for cur.Next(pool.ctx) {
 		var temp testModel
 		err = cur.Decode(&temp)
 		assert.NoError(t, err)

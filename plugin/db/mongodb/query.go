@@ -11,21 +11,21 @@ import (
 )
 
 type query struct {
-	Filter bson.M
-	Opt    *options.FindOptions
-	Pool   *connectPool
-	Sort   bson.D
-	Struct identity.IStruct
+	filter      bson.M
+	findOption  *options.FindOptions
+	modelStruct identity.IStruct
+	pool        *connectPool
+	sorts       bson.D
 }
 
 func (m query) Count() (int64, error) {
-	c, err := m.Pool.GetCollection(m.Struct)
+	c, err := m.pool.GetCollection(m.modelStruct)
 	if err != nil {
 		return 0, err
 	}
 
 	defer m.Reset()
-	return c.CountDocuments(m.Pool.Ctx, m.Filter)
+	return c.CountDocuments(m.pool.ctx, m.filter)
 }
 
 func (m *query) Order(fields ...string) db.IQuery {
@@ -39,49 +39,49 @@ func (m *query) OrderByDesc(fields ...string) db.IQuery {
 }
 
 func (m *query) Reset() {
-	m.Filter = make(bson.M)
-	m.Opt = options.Find()
-	m.Sort = bson.D{}
+	m.filter = make(bson.M)
+	m.findOption = options.Find()
+	m.sorts = bson.D{}
 }
 
 func (m *query) Skip(v int) db.IQuery {
-	m.Opt = m.Opt.SetSkip(
+	m.findOption = m.findOption.SetSkip(
 		int64(v),
 	)
 	return m
 }
 
 func (m *query) Take(v int) db.IQuery {
-	m.Opt = m.Opt.SetLimit(
+	m.findOption = m.findOption.SetLimit(
 		int64(v),
 	)
 	return m
 }
 
 func (m *query) ToArray(dst interface{}) error {
-	c, err := m.Pool.GetCollection(m.Struct)
+	c, err := m.pool.GetCollection(m.modelStruct)
 	if err != nil {
 		return err
 	}
 
 	defer m.Reset()
 
-	if len(m.Sort) > 0 {
-		m.Opt = m.Opt.SetSort(m.Sort)
+	if len(m.sorts) > 0 {
+		m.findOption = m.findOption.SetSort(m.sorts)
 	}
 
-	cur, err := c.Find(m.Pool.Ctx, m.Filter, m.Opt)
+	cur, err := c.Find(m.pool.ctx, m.filter, m.findOption)
 	if err != nil {
 		return err
 	}
 
 	sliceType := reflect.SliceOf(
-		m.Struct.GetType(),
+		m.modelStruct.GetType(),
 	)
 	sliceValue := reflect.MakeSlice(sliceType, 0, 0)
-	for cur.Next(m.Pool.Ctx) {
+	for cur.Next(m.pool.ctx) {
 		value := reflect.New(
-			m.Struct.GetType(),
+			m.modelStruct.GetType(),
 		)
 		temp := value.Interface()
 		err = cur.Decode(temp)
@@ -101,24 +101,24 @@ func (m *query) Where(args ...interface{}) db.IQuery {
 	}
 
 	if f, ok := args[0].(bson.M); ok {
-		m.Filter = f
+		m.filter = f
 	}
 	return m
 }
 
 func (m *query) sort(flag int, fields []string) {
 	underscore.Chain(fields).Each(func(r string, _ int) {
-		m.Sort = append(m.Sort, bson.E{
+		m.sorts = append(m.sorts, bson.E{
 			Key:   r,
 			Value: flag,
 		})
 	})
 }
 
-func newQuery(pool *connectPool, s identity.IStruct) *query {
+func newQuery(pool *connectPool, modelStruct identity.IStruct) *query {
 	q := &query{
-		Pool:   pool,
-		Struct: s,
+		modelStruct: modelStruct,
+		pool:        pool,
 	}
 	q.Reset()
 	return q
