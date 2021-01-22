@@ -1,6 +1,7 @@
 package mysqldb
 
 import (
+	"fmt"
 	"reflect"
 
 	underscore "github.com/ahl5esoft/golang-underscore"
@@ -48,6 +49,7 @@ func (m *query) ToArray(dst interface{}) (err error) {
 		return
 	}
 
+	fmt.Println(sql, err)
 	err = m.DB.Select(dst, sql, m.Option.WhereArgs...)
 	return
 }

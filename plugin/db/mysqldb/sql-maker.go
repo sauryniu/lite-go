@@ -159,8 +159,6 @@ func (m sqlMaker) GetSelect(opt queryOption) (string, error) {
 			bf,
 			" `",
 			r.GetName(),
-			"` as `",
-			r.GetField().Name,
 			"`",
 		)
 	})

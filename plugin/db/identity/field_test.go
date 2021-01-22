@@ -8,8 +8,8 @@ import (
 )
 
 type testField struct {
-	FieldA string `db:"a,"`
-	FieldB string `db:"b,test"`
+	FieldA string `db:"a" alias:""`
+	FieldB string `db:"b" alias:"test"`
 	FieldC string
 }
 

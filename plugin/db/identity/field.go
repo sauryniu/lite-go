@@ -2,17 +2,12 @@ package identity
 
 import (
 	"reflect"
-	"strings"
 )
 
 type identityField struct {
 	field      reflect.StructField
 	name       string
 	structName string
-}
-
-func (m identityField) GetField() reflect.StructField {
-	return m.field
 }
 
 func (m identityField) GetName() string {
@@ -29,20 +24,14 @@ func (m identityField) GetValue(structValue reflect.Value) interface{} {
 
 // NewField is IField实例
 func NewField(f reflect.StructField, identityType reflect.Type) IField {
-	tag := f.Tag.Get("db")
-	tagArgs := strings.Split(tag, ",")
-
-	name := tagArgs[0]
+	name := f.Tag.Get("db")
 	if name == "" {
 		name = f.Name
 	}
 
-	var structName string
-	if len(tagArgs) > 1 {
-		structName = tagArgs[1]
-		if tagArgs[1] == "" {
-			structName = identityType.Name()
-		}
+	structName, ok := f.Tag.Lookup("alias")
+	if ok && structName == "" {
+		structName = identityType.Name()
 	}
 	return identityField{
 		field:      f,

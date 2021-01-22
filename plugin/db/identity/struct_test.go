@@ -9,7 +9,7 @@ import (
 )
 
 type testStruct struct {
-	ID   string `db:"id,test"`
+	ID   string `db:"id" alias:"test"`
 	Name string `db:"name"`
 }
 
