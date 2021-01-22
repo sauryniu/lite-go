@@ -148,7 +148,23 @@ func (m sqlMaker) GetSelect(opt queryOption) (string, error) {
 	}
 
 	bf := make([]string, 0)
-	bf = append(bf, "SELECT * FROM `", tableName, "`")
+	bf = append(bf, "SELECT")
+	underscore.Chain(
+		m.Table.FindFields(),
+	).Each(func(r identity.IField, i int) {
+		if i > 0 {
+			bf = append(bf, ",")
+		}
+		bf = append(
+			bf,
+			" `",
+			r.GetName(),
+			"` as `",
+			r.GetField().Name,
+			"`",
+		)
+	})
+	bf = append(bf, " FROM `", tableName, "`")
 	if opt.Where != "" {
 		bf = append(bf, " WHERE ", opt.Where)
 	}

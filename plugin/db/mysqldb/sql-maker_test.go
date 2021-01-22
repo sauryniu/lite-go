@@ -54,7 +54,7 @@ func Test_sqlMaker_GetSelect(t *testing.T) {
 	res, _ := newSQLMaker(
 		reflect.TypeOf(testSQLMaker{}),
 	).GetSelect(queryOption{})
-	assert.Equal(t, res, "SELECT * FROM `tname`")
+	assert.Equal(t, res, "SELECT `id` as `ID`, `Name` as `Name`, `a` as `Age` FROM `tname`")
 }
 
 func Test_sqlMaker_GetSelect_排序(t *testing.T) {
@@ -72,7 +72,7 @@ func Test_sqlMaker_GetSelect_排序(t *testing.T) {
 			},
 		},
 	})
-	assert.Equal(t, res, "SELECT * FROM `tname` ORDER BY `id` DESC, `name` ASC")
+	assert.Equal(t, res, "SELECT `id` as `ID`, `Name` as `Name`, `a` as `Age` FROM `tname` ORDER BY `id` DESC, `name` ASC")
 }
 
 func Test_sqlMaker_GetSelect_条件(t *testing.T) {
@@ -81,7 +81,7 @@ func Test_sqlMaker_GetSelect_条件(t *testing.T) {
 	).GetSelect(queryOption{
 		Where: "id > 10",
 	})
-	assert.Equal(t, res, "SELECT * FROM `tname` WHERE id > 10")
+	assert.Equal(t, res, "SELECT `id` as `ID`, `Name` as `Name`, `a` as `Age` FROM `tname` WHERE id > 10")
 }
 
 func Test_sqlMaker_GetSelect_Skip或Take大于0(t *testing.T) {
@@ -91,5 +91,5 @@ func Test_sqlMaker_GetSelect_Skip或Take大于0(t *testing.T) {
 		Skip: 10,
 		Take: 100,
 	})
-	assert.Equal(t, res, "SELECT * FROM `tname` LIMIT 10,100")
+	assert.Equal(t, res, "SELECT `id` as `ID`, `Name` as `Name`, `a` as `Age` FROM `tname` LIMIT 10,100")
 }

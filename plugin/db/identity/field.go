@@ -11,6 +11,10 @@ type identityField struct {
 	structName string
 }
 
+func (m identityField) GetField() reflect.StructField {
+	return m.field
+}
+
 func (m identityField) GetName() string {
 	return m.name
 }

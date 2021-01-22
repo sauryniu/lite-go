@@ -148,20 +148,22 @@ func Test_file_ReadYaml(t *testing.T) {
 	defer f.Close()
 
 	text := `name: n
-age: 11`
+ages:
+- 11
+- 22`
 	_, err = f.WriteString(text)
 	assert.NoError(t, err)
 
 	type testStruct struct {
 		Name string
-		Age  int
+		Ages []int
 	}
 	var v testStruct
 	err = file.ReadYaml(&v)
 	assert.NoError(t, err)
 	assert.Equal(t, v, testStruct{
 		Name: "n",
-		Age:  11,
+		Ages: []int{11, 22},
 	})
 }
 
