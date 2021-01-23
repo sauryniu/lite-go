@@ -1,9 +1,9 @@
 package redisex
 
 import (
-	"fmt"
 	"time"
 
+	underscore "github.com/ahl5esoft/golang-underscore"
 	"github.com/ahl5esoft/lite-go/thread"
 )
 
@@ -12,8 +12,11 @@ type redisLock struct {
 	seconds time.Duration
 }
 
-func (m *redisLock) Lock(format string, args ...interface{}) (func(), error) {
-	key := fmt.Sprintf(format, args...)
+func (m *redisLock) Lock(key string, options ...thread.LockOption) (func(), error) {
+	underscore.Chain(options).Each(func(r thread.LockOption, _ int) {
+		r(m)
+	})
+
 	ok, err := m.redis.Set(key, "", "ex", m.seconds, "nx")
 	if ok && err == nil {
 		return func() {
@@ -24,14 +27,16 @@ func (m *redisLock) Lock(format string, args ...interface{}) (func(), error) {
 	return nil, err
 }
 
-func (m *redisLock) SetExpire(seconds time.Duration) thread.ILock {
-	m.seconds = seconds
-	return m
-}
-
 // NewLock is thread.ILock
 func NewLock(redis IRedis) thread.ILock {
 	return &redisLock{
 		redis: redis,
+	}
+}
+
+// NewExpireLockOption is 过期锁选项
+func NewExpireLockOption(seconds time.Duration) thread.LockOption {
+	return func(lock thread.ILock) {
+		lock.(*redisLock).seconds = seconds
 	}
 }

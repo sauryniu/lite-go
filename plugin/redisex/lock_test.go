@@ -22,7 +22,7 @@ func Test_redisLock_Lock(t *testing.T) {
 		gomock.Eq("nx"),
 	).Return(true, nil)
 
-	res, resErr := NewLock(redis).Lock("lock-%s", "ok")
+	res, resErr := NewLock(redis).Lock("lock-ok")
 	assert.NoError(t, resErr)
 	assert.NotNil(t, res)
 
@@ -73,7 +73,7 @@ func Test_redisLock_Lock_fail(t *testing.T) {
 	assert.Nil(t, res)
 }
 
-func Test_redisLock_SetExpire(t *testing.T) {
+func Test_redisLock_Lock_Expire(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -86,7 +86,10 @@ func Test_redisLock_SetExpire(t *testing.T) {
 		gomock.Eq("nx"),
 	).Return(true, nil)
 
-	res, resErr := NewLock(redis).SetExpire(5 * time.Second).Lock("lock-expires")
+	res, resErr := NewLock(redis).Lock(
+		"lock-expires",
+		NewExpireLockOption(5*time.Second),
+	)
 	assert.NoError(t, resErr)
 	assert.NotNil(t, res)
 }

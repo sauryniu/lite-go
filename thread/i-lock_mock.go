@@ -7,7 +7,6 @@ package thread
 import (
 	gomock "github.com/golang/mock/gomock"
 	reflect "reflect"
-	time "time"
 )
 
 // MockILock is a mock of ILock interface
@@ -34,10 +33,10 @@ func (m *MockILock) EXPECT() *MockILockMockRecorder {
 }
 
 // Lock mocks base method
-func (m *MockILock) Lock(arg0 string, arg1 ...interface{}) (func(), error) {
+func (m *MockILock) Lock(key string, options ...LockOption) (func(), error) {
 	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0}
-	for _, a := range arg1 {
+	varargs := []interface{}{key}
+	for _, a := range options {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Lock", varargs...)
@@ -47,22 +46,8 @@ func (m *MockILock) Lock(arg0 string, arg1 ...interface{}) (func(), error) {
 }
 
 // Lock indicates an expected call of Lock
-func (mr *MockILockMockRecorder) Lock(arg0 interface{}, arg1 ...interface{}) *gomock.Call {
+func (mr *MockILockMockRecorder) Lock(key interface{}, options ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0}, arg1...)
+	varargs := append([]interface{}{key}, options...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Lock", reflect.TypeOf((*MockILock)(nil).Lock), varargs...)
-}
-
-// SetExpire mocks base method
-func (m *MockILock) SetExpire(seconds time.Duration) ILock {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetExpire", seconds)
-	ret0, _ := ret[0].(ILock)
-	return ret0
-}
-
-// SetExpire indicates an expected call of SetExpire
-func (mr *MockILockMockRecorder) SetExpire(seconds interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetExpire", reflect.TypeOf((*MockILock)(nil).SetExpire), seconds)
 }
