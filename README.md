@@ -1,4 +1,4 @@
-# ![Version](https://img.shields.io/badge/version-0.0.40-green.svg)
+# ![Version](https://img.shields.io/badge/version-0.0.41-green.svg)
 
 ## 结构
 * api - api相关
