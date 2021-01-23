@@ -17,6 +17,19 @@ func New(code Code, format string, args ...interface{}) Custom {
 	}
 }
 
+// NewTip is 提醒错误
+func NewTip(err error) Custom {
+	return New(
+		TipCode,
+		err.Error(),
+	)
+}
+
+// NewTipf is 提醒错误
+func NewTipf(format string, args ...interface{}) Custom {
+	return New(TipCode, format, args...)
+}
+
 // Throw is 抛出异常
 func Throw(code Code, format string, args ...interface{}) {
 	panic(
