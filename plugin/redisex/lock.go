@@ -8,15 +8,20 @@ import (
 )
 
 type redisLock struct {
-	Redis IRedis
-
-	key     string
+	redis   IRedis
 	seconds time.Duration
 }
 
-func (m *redisLock) Lock(format string, args ...interface{}) (bool, error) {
-	m.key = fmt.Sprintf(format, args...)
-	return m.Redis.Set(m.key, "", "ex", m.seconds, "nx")
+func (m *redisLock) Lock(format string, args ...interface{}) (func(), error) {
+	key := fmt.Sprintf(format, args...)
+	ok, err := m.redis.Set(key, "", "ex", m.seconds, "nx")
+	if ok && err == nil {
+		return func() {
+			m.redis.Del(key)
+		}, nil
+	}
+
+	return nil, err
 }
 
 func (m *redisLock) SetExpire(seconds time.Duration) thread.ILock {
@@ -24,13 +29,9 @@ func (m *redisLock) SetExpire(seconds time.Duration) thread.ILock {
 	return m
 }
 
-func (m *redisLock) Unlock() {
-	m.Redis.Del(m.key)
-}
-
 // NewLock is thread.ILock
 func NewLock(redis IRedis) thread.ILock {
 	return &redisLock{
-		Redis: redis,
+		redis: redis,
 	}
 }

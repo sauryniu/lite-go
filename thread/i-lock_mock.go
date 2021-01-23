@@ -34,14 +34,14 @@ func (m *MockILock) EXPECT() *MockILockMockRecorder {
 }
 
 // Lock mocks base method
-func (m *MockILock) Lock(arg0 string, arg1 ...interface{}) (bool, error) {
+func (m *MockILock) Lock(arg0 string, arg1 ...interface{}) (func(), error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0}
 	for _, a := range arg1 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Lock", varargs...)
-	ret0, _ := ret[0].(bool)
+	ret0, _ := ret[0].(func())
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -65,16 +65,4 @@ func (m *MockILock) SetExpire(seconds time.Duration) ILock {
 func (mr *MockILockMockRecorder) SetExpire(seconds interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetExpire", reflect.TypeOf((*MockILock)(nil).SetExpire), seconds)
-}
-
-// Unlock mocks base method
-func (m *MockILock) Unlock() {
-	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "Unlock")
-}
-
-// Unlock indicates an expected call of Unlock
-func (mr *MockILockMockRecorder) Unlock() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Unlock", reflect.TypeOf((*MockILock)(nil).Unlock))
 }

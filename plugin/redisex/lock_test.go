@@ -1,6 +1,7 @@
 package redisex
 
 import (
+	"errors"
 	"testing"
 	"time"
 
@@ -14,15 +15,62 @@ func Test_redisLock_Lock(t *testing.T) {
 
 	redis := NewMockIRedis(ctrl)
 	redis.EXPECT().Set(
-		gomock.Eq("test: 5"),
+		gomock.Eq("lock-ok"),
 		gomock.Eq(""),
 		gomock.Eq("ex"),
 		gomock.Eq(0*time.Second),
 		gomock.Eq("nx"),
 	).Return(true, nil)
 
-	ok, _ := NewLock(redis).Lock("test: %d", 5)
-	assert.True(t, ok)
+	res, resErr := NewLock(redis).Lock("lock-%s", "ok")
+	assert.NoError(t, resErr)
+	assert.NotNil(t, res)
+
+	redis.EXPECT().Del(
+		gomock.Eq("lock-ok"),
+	).Return(0, nil)
+	res()
+}
+
+func Test_redisLock_Lock_error(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	err := errors.New("err")
+	redis := NewMockIRedis(ctrl)
+	redis.EXPECT().Set(
+		gomock.Eq("lock-err"),
+		gomock.Eq(""),
+		gomock.Eq("ex"),
+		gomock.Eq(0*time.Second),
+		gomock.Eq("nx"),
+	).Return(
+		true,
+		err,
+	)
+
+	res, resErr := NewLock(redis).Lock("lock-err")
+	assert.Error(t, resErr)
+	assert.Equal(t, resErr, err)
+	assert.Nil(t, res)
+}
+
+func Test_redisLock_Lock_fail(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	redis := NewMockIRedis(ctrl)
+	redis.EXPECT().Set(
+		gomock.Eq("lock-fail"),
+		gomock.Eq(""),
+		gomock.Eq("ex"),
+		gomock.Eq(0*time.Second),
+		gomock.Eq("nx"),
+	).Return(false, nil)
+
+	res, resErr := NewLock(redis).Lock("lock-fail")
+	assert.NoError(t, resErr)
+	assert.Nil(t, res)
 }
 
 func Test_redisLock_SetExpire(t *testing.T) {
@@ -31,25 +79,14 @@ func Test_redisLock_SetExpire(t *testing.T) {
 
 	redis := NewMockIRedis(ctrl)
 	redis.EXPECT().Set(
-		gomock.Eq("test: 5"),
+		gomock.Eq("lock-expires"),
 		gomock.Eq(""),
 		gomock.Eq("ex"),
 		gomock.Eq(5*time.Second),
 		gomock.Eq("nx"),
 	).Return(true, nil)
 
-	ok, _ := NewLock(redis).SetExpire(5*time.Second).Lock("test: %d", 5)
-	assert.True(t, ok)
-}
-
-func Test_rediscLock_Unlock(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	redis := NewMockIRedis(ctrl)
-	redis.EXPECT().Del(
-		gomock.Eq(""),
-	).Return(0, nil)
-
-	NewLock(redis).Unlock()
+	res, resErr := NewLock(redis).SetExpire(5 * time.Second).Lock("lock-expires")
+	assert.NoError(t, resErr)
+	assert.NotNil(t, res)
 }

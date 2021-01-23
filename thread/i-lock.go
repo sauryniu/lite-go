@@ -7,7 +7,6 @@ const LockIoCKey = "lock"
 
 // ILock is 锁接口
 type ILock interface {
-	Lock(string, ...interface{}) (bool, error)
+	Lock(format string, args ...interface{}) (unlock func(), err error)
 	SetExpire(seconds time.Duration) ILock
-	Unlock()
 }
