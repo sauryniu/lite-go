@@ -4,11 +4,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ahl5esoft/lite-go/timeex"
 	gomock "github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_redisNowTime_NanoUnix(t *testing.T) {
+func Test_NowTime_Unix(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -18,11 +19,13 @@ func Test_redisNowTime_NanoUnix(t *testing.T) {
 		nil,
 	)
 
-	res := NewNowTime(mockRedis).NanoUnix()
+	var nowUnix timeex.INowUnix
+	nowUnix = &NowTime{mockRedis}
+	res := nowUnix.Unix()
 	assert.NotEqual(t, res, 100)
 }
 
-func Test_redisNowTime_Unix(t *testing.T) {
+func Test_NowTime_UnixNano(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -32,6 +35,8 @@ func Test_redisNowTime_Unix(t *testing.T) {
 		nil,
 	)
 
-	res := NewNowTime(mockRedis).Unix()
+	var nowUnixNano timeex.INowUnixNano
+	nowUnixNano = &NowTime{mockRedis}
+	res := nowUnixNano.UnixNano()
 	assert.NotEqual(t, res, 100)
 }

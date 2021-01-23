@@ -1,21 +1,12 @@
 package redisex
 
-import "github.com/ahl5esoft/lite-go/timeex"
-
-type redisNowTime struct {
+// NowTime is 当前时间
+type NowTime struct {
 	Redis IRedis
 }
 
-func (m redisNowTime) NanoUnix() int64 {
-	t, err := m.Redis.Time()
-	if err != nil {
-		return 0
-	}
-
-	return t.UnixNano()
-}
-
-func (m redisNowTime) Unix() int64 {
+// Unix is 当前Unix秒级
+func (m NowTime) Unix() int64 {
 	t, err := m.Redis.Time()
 	if err != nil {
 		return 0
@@ -24,9 +15,12 @@ func (m redisNowTime) Unix() int64 {
 	return t.Unix()
 }
 
-// NewNowTime is timeex.INowTime实例
-func NewNowTime(redis IRedis) timeex.INowTime {
-	return &redisNowTime{
-		Redis: redis,
+// UnixNano is 当前Unix纳秒级
+func (m NowTime) UnixNano() int64 {
+	t, err := m.Redis.Time()
+	if err != nil {
+		return 0
 	}
+
+	return t.UnixNano()
 }
