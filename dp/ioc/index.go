@@ -8,26 +8,28 @@ import (
 )
 
 const (
-	instanceIsNotPtr = "ioc: 注入实例必须是指针"
-	invalidIDFormat  = "ioc: 无效标识(%s)"
+	instanceIsNotPtr       = "ioc: 注入实例必须是指针"
+	invalidTypeFormat      = "ioc: 无效类型(%v)"
+	notImplementsFormat    = "ioc: %v没有实现%v"
+	notInterfaceTypeFormat = "ioc: 非接口类型(%v)"
 )
 
-var idOfInstance = make(map[string]interface{})
+var typeOfInstance = make(map[reflect.Type]interface{})
 
 // Get is 获取实例
-func Get(id string) interface{} {
-	if v, ok := idOfInstance[id]; ok {
+func Get(t reflect.Type) interface{} {
+	if v, ok := typeOfInstance[t]; ok {
 		return v
 	}
 
 	panic(
-		fmt.Sprintf(invalidIDFormat, id),
+		fmt.Errorf(invalidTypeFormat, t),
 	)
 }
 
 // Has is 是否存在
-func Has(id string) bool {
-	_, ok := idOfInstance[id]
+func Has(t reflect.Type) bool {
+	_, ok := typeOfInstance[t]
 	return ok
 }
 
@@ -45,22 +47,21 @@ func Inject(instance interface{}) {
 		1,
 	).Each(func(r int, _ int) {
 		field := instanceValue.Type().Field(r)
-		id, ok := field.Tag.Lookup("inject")
+		_, ok := field.Tag.Lookup("inject")
 		if !ok {
 			return
 		}
 
 		fieldValue := instanceValue.FieldByIndex(field.Index)
 		if fieldValue.Kind() == reflect.Ptr {
-			fieldValue.Set(
-				reflect.New(
-					field.Type.Elem(),
-				),
+			value := reflect.New(
+				field.Type.Elem(),
 			)
+			fieldValue.Set(value)
 			fieldValue = fieldValue.Elem()
 		}
 
-		v := Get(id)
+		v := Get(field.Type)
 		fieldValue.Set(
 			reflect.ValueOf(v),
 		)
@@ -68,13 +69,26 @@ func Inject(instance interface{}) {
 }
 
 // Remove is 删除
-func Remove(id string) {
-	if Has(id) {
-		delete(idOfInstance, id)
+func Remove(t reflect.Type) {
+	if Has(t) {
+		delete(typeOfInstance, t)
 	}
 }
 
 // Set is 设置依赖注入
-func Set(id string, instance interface{}) {
-	idOfInstance[id] = instance
+func Set(interfaceType reflect.Type, instance interface{}) {
+	if interfaceType.Kind() != reflect.Interface {
+		panic(
+			fmt.Errorf(notInterfaceTypeFormat, interfaceType),
+		)
+	}
+
+	instanceType := reflect.TypeOf(instance)
+	if !instanceType.Implements(interfaceType) {
+		panic(
+			fmt.Errorf(notImplementsFormat, instance, interfaceType),
+		)
+	}
+
+	typeOfInstance[interfaceType] = instance
 }
