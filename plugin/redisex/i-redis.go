@@ -2,9 +2,6 @@ package redisex
 
 import "time"
 
-// IoCKey is 依赖注入键
-const IoCKey = "redis"
-
 // IRedis is redis接口
 type IRedis interface {
 	Close() error
