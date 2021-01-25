@@ -4,61 +4,106 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/ahl5esoft/lite-go/dp/ioc"
+	"github.com/ahl5esoft/lite-go/reflectex"
 	"github.com/stretchr/testify/assert"
 )
 
 type testContext struct {
-	count   int
-	isBreak bool
+	count int
 }
 
-func (m *testContext) Break() {
-	m.isBreak = true
+type testHandler struct {
+	IHandler
+
+	count int
+	ctx   *testContext
 }
 
-func (m testContext) IsBreak() bool {
-	return m.isBreak
+func (m *testHandler) Handle() error {
+	if m.count < 0 {
+		return errors.New("err")
+	}
+
+	m.ctx.count = m.ctx.count + m.count
+	return m.IHandler.Handle()
 }
 
-func Test_handler_Handle(t *testing.T) {
+type testBreakHandler struct {
+	IHandler
+
+	ctx *testContext
+}
+
+func (m testBreakHandler) Handle() error {
+	m.Break()
+	return m.IHandler.Handle()
+}
+
+type iCounter interface {
+	Count() int
+}
+
+type testCounter int
+
+func (m testCounter) Count() int {
+	return int(m)
+}
+
+type testCounterHandler struct {
+	IHandler
+
+	Counter iCounter `inject:""`
+
+	ctx *testContext
+}
+
+func (m testCounterHandler) Handle() error {
+	m.ctx.count = m.Counter.Count()
+	return m.IHandler.Handle()
+}
+
+func Test_Handler_Handle(t *testing.T) {
 	ctx := new(testContext)
-	err := New(func(ctx interface{}) error {
-		ctx.(*testContext).count = 5
-		return nil
-	}).Handle(ctx)
+	err := (&testHandler{
+		IHandler: New(),
+		count:    5,
+		ctx:      ctx,
+	}).Handle()
 	assert.NoError(t, err)
 	assert.Equal(t, ctx.count, 5)
 }
 
-func Test_handler_SetNext(t *testing.T) {
+func Test_Handler_SetNext(t *testing.T) {
 	ctx := new(testContext)
-	h := New(func(ctx interface{}) error {
-		ctx.(*testContext).count = 5
-		return nil
+	h := &testHandler{
+		IHandler: New(),
+		count:    10,
+		ctx:      ctx,
+	}
+	h.SetNext(&testHandler{
+		IHandler: New(),
+		count:    5,
+		ctx:      ctx,
 	})
-	h.SetNext(
-		New(func(ctx interface{}) error {
-			ctx.(*testContext).count = ctx.(*testContext).count + 10
-			return nil
-		}),
-	)
-	err := h.Handle(ctx)
+	err := h.Handle()
 	assert.NoError(t, err)
 	assert.Equal(t, ctx.count, 15)
 }
 
 func Test_handler_SetNext_第一个错误(t *testing.T) {
 	ctx := new(testContext)
-	h := New(func(ctx interface{}) error {
-		return errors.New("err")
+	h := &testHandler{
+		IHandler: New(),
+		count:    -1,
+		ctx:      ctx,
+	}
+	h.SetNext(&testHandler{
+		IHandler: New(),
+		count:    5,
+		ctx:      ctx,
 	})
-	h.SetNext(
-		New(func(ctx interface{}) error {
-			ctx.(*testContext).count = 5
-			return nil
-		}),
-	)
-	err := h.Handle(ctx)
+	err := h.Handle()
 	assert.Error(t, err)
 	assert.Equal(
 		t,
@@ -70,33 +115,33 @@ func Test_handler_SetNext_第一个错误(t *testing.T) {
 
 func Test_handler_SetNext_第一个跳出(t *testing.T) {
 	ctx := new(testContext)
-	h := New(func(ctx interface{}) error {
-		ctx.(*testContext).Break()
-		return nil
+	h := &testBreakHandler{
+		IHandler: New(),
+		ctx:      ctx,
+	}
+	h.SetNext(&testHandler{
+		IHandler: New(),
+		count:    5,
+		ctx:      ctx,
 	})
-	h.SetNext(
-		New(func(ctx interface{}) error {
-			ctx.(*testContext).count = 5
-			return nil
-		}),
-	)
-	err := h.Handle(ctx)
+	err := h.Handle()
 	assert.NoError(t, err)
 	assert.Equal(t, ctx.count, 0)
 }
 
 func Test_handler_SetNext_第二个错误(t *testing.T) {
 	ctx := new(testContext)
-	h := New(func(ctx interface{}) error {
-		ctx.(*testContext).count = 5
-		return nil
+	h := &testHandler{
+		IHandler: New(),
+		count:    5,
+		ctx:      ctx,
+	}
+	h.SetNext(&testHandler{
+		IHandler: New(),
+		count:    -1,
+		ctx:      ctx,
 	})
-	h.SetNext(
-		New(func(ctx interface{}) error {
-			return errors.New("err")
-		}),
-	)
-	err := h.Handle(ctx)
+	err := h.Handle()
 	assert.Error(t, err)
 	assert.Equal(
 		t,
@@ -104,4 +149,29 @@ func Test_handler_SetNext_第二个错误(t *testing.T) {
 		"err",
 	)
 	assert.Equal(t, ctx.count, 5)
+}
+
+func Test_Handler_SetNext_注入(t *testing.T) {
+	counterType := reflectex.InterfaceTypeOf(
+		(*iCounter)(nil),
+	)
+	ioc.Set(
+		counterType,
+		testCounter(11),
+	)
+
+	ctx := new(testContext)
+	h := &testHandler{
+		IHandler: New(),
+		count:    0,
+		ctx:      ctx,
+	}
+	h.SetNext(&testCounterHandler{
+		IHandler: New(),
+		ctx:      ctx,
+	})
+
+	err := h.Handle()
+	assert.NoError(t, err)
+	assert.Equal(t, ctx.count, 11)
 }

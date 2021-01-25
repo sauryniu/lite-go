@@ -1,30 +1,31 @@
 package cor
 
+import "github.com/ahl5esoft/lite-go/dp/ioc"
+
 type handler struct {
-	handleFunc func(ctx interface{}) error
-	next       IHandler
+	isBreak bool
+	next    IHandler
 }
 
-func (m handler) Handle(ctx interface{}) (err error) {
-	if err = m.handleFunc(ctx); err != nil || m.next == nil {
+func (m *handler) Break() {
+	m.isBreak = true
+}
+
+func (m handler) Handle() (err error) {
+	if m.next == nil || m.isBreak {
 		return
 	}
 
-	if breakable, ok := ctx.(IBreakable); ok && breakable.IsBreak() {
-		return
-	}
-
-	return m.next.Handle(ctx)
+	return m.next.Handle()
 }
 
 func (m *handler) SetNext(handler IHandler) IHandler {
 	m.next = handler
+	ioc.Inject(handler)
 	return handler
 }
 
-// New is 创建IHandler
-func New(handleFunc func(ctx interface{}) error) IHandler {
-	return &handler{
-		handleFunc: handleFunc,
-	}
+// New is 创建IHandler基类
+func New() IHandler {
+	return new(handler)
 }
