@@ -6,6 +6,6 @@ type INode interface {
 	GetParent() IDirectory
 	GetPath() string
 	IsExist() bool
-	Move(dstPath string) error
+	Move(pathArgs ...string) error
 	Remove() error
 }

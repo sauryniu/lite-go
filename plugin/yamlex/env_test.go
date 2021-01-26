@@ -23,7 +23,7 @@ func Test_NewEnv_Get_Array(t *testing.T) {
 	key := "arr"
 	var res []interface{}
 	NewEnv(
-		[]byte(`str:
+		[]byte(`arr:
 - 1
 - 2
 - 3`),

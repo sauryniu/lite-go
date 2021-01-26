@@ -89,17 +89,21 @@ func (mr *MockINodeMockRecorder) IsExist() *gomock.Call {
 }
 
 // Move mocks base method
-func (m *MockINode) Move(dstPath string) error {
+func (m *MockINode) Move(pathArgs ...string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Move", dstPath)
+	varargs := []interface{}{}
+	for _, a := range pathArgs {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "Move", varargs...)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Move indicates an expected call of Move
-func (mr *MockINodeMockRecorder) Move(dstPath interface{}) *gomock.Call {
+func (mr *MockINodeMockRecorder) Move(pathArgs ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Move", reflect.TypeOf((*MockINode)(nil).Move), dstPath)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Move", reflect.TypeOf((*MockINode)(nil).Move), pathArgs...)
 }
 
 // Remove mocks base method

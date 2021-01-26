@@ -32,7 +32,8 @@ func (m node) IsExist() bool {
 	return err == nil || os.IsExist(err)
 }
 
-func (m node) Move(dstPath string) error {
+func (m node) Move(pathArgs ...string) error {
+	dstPath := iopath.Join(pathArgs...)
 	return os.Rename(
 		m.GetPath(),
 		dstPath,
