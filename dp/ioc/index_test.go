@@ -31,7 +31,9 @@ func Test_Get(t *testing.T) {
 		)
 	}()
 
-	ct := reflect.TypeOf(1)
+	ct := getInterfaceType(
+		(*iInterface)(nil),
+	)
 	typeOfInstance[ct] = 1
 	defer delete(typeOfInstance, ct)
 
@@ -40,7 +42,9 @@ func Test_Get(t *testing.T) {
 }
 
 func Test_Get_无效类型(t *testing.T) {
-	ct := reflect.TypeOf(1)
+	ct := getInterfaceType(
+		(*iInterface)(nil),
+	)
 	defer func() {
 		rv := recover()
 		assert.NotNil(t, rv)
@@ -58,7 +62,9 @@ func Test_Get_无效类型(t *testing.T) {
 }
 
 func Test_Has(t *testing.T) {
-	ct := reflect.TypeOf(1)
+	ct := getInterfaceType(
+		(*iInterface)(nil),
+	)
 	typeOfInstance[ct] = 1
 	defer delete(typeOfInstance, ct)
 
@@ -69,7 +75,9 @@ func Test_Has(t *testing.T) {
 }
 
 func Test_Inject(t *testing.T) {
-	it := reflectex.InterfaceTypeOf((*iInterface)(nil))
+	it := getInterfaceType(
+		(*iInterface)(nil),
+	)
 	typeOfInstance[it] = new(derive)
 
 	var m myTest
@@ -79,7 +87,9 @@ func Test_Inject(t *testing.T) {
 }
 
 func Test_Remove(t *testing.T) {
-	ct := reflect.TypeOf(1)
+	it := getInterfaceType(
+		(*iInterface)(nil),
+	)
 	defer func() {
 		assert.Nil(
 			t,
@@ -87,10 +97,69 @@ func Test_Remove(t *testing.T) {
 		)
 	}()
 
-	Remove(ct)
+	Remove(it)
 }
 
 func Test_Set(t *testing.T) {
+	defer func() {
+		assert.Nil(
+			t,
+			recover(),
+		)
+	}()
+
+	ct := reflectex.InterfaceTypeOf(
+		(*iInterface)(nil),
+	)
+	defer delete(typeOfInstance, ct)
+
+	Set(
+		ct,
+		new(derive),
+	)
+}
+
+func Test_Set_非接口类型(t *testing.T) {
+	it := reflect.TypeOf(1)
+	defer func() {
+		rv := recover()
+		assert.NotNil(t, rv)
+
+		err, ok := rv.(error)
+		assert.True(t, ok)
+		assert.Equal(
+			t,
+			err,
+			fmt.Errorf(notInterfaceTypeFormat, it),
+		)
+	}()
+	Set(
+		it,
+		new(derive),
+	)
+}
+
+func Test_Set_没有继承(t *testing.T) {
+	it := getInterfaceType(
+		(*iInterface)(nil),
+	)
+	v := ""
+	defer func() {
+		rv := recover()
+		assert.NotNil(t, rv)
+
+		err, ok := rv.(error)
+		assert.True(t, ok)
+		assert.Equal(
+			t,
+			err,
+			fmt.Errorf(notImplementsFormat, v, it),
+		)
+	}()
+	Set(it, v)
+}
+
+func Test_Set_对象(t *testing.T) {
 	defer func() {
 		assert.Nil(
 			t,
@@ -102,45 +171,10 @@ func Test_Set(t *testing.T) {
 	defer delete(typeOfInstance, ct)
 
 	Set(
-		ct,
+		(*iInterface)(nil),
 		new(derive),
 	)
-}
 
-func Test_Set_非接口类型(t *testing.T) {
-	ct := reflect.TypeOf(1)
-	defer func() {
-		rv := recover()
-		assert.NotNil(t, rv)
-
-		err, ok := rv.(error)
-		assert.True(t, ok)
-		assert.Equal(
-			t,
-			err,
-			fmt.Errorf(notInterfaceTypeFormat, ct),
-		)
-	}()
-	Set(
-		ct,
-		new(derive),
-	)
-}
-
-func Test_Set_没有继承(t *testing.T) {
-	ct := reflectex.InterfaceTypeOf((*iInterface)(nil))
-	v := ""
-	defer func() {
-		rv := recover()
-		assert.NotNil(t, rv)
-
-		err, ok := rv.(error)
-		assert.True(t, ok)
-		assert.Equal(
-			t,
-			err,
-			fmt.Errorf(notImplementsFormat, v, ct),
-		)
-	}()
-	Set(ct, v)
+	_, ok := typeOfInstance[ct]
+	assert.True(t, ok)
 }

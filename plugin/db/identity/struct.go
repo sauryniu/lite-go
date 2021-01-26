@@ -64,6 +64,9 @@ func (m *identityStruct) GetType() reflect.Type {
 
 // NewStruct is IStruct实例
 func NewStruct(structType reflect.Type) IStruct {
+	if structType.Kind() == reflect.Ptr {
+		structType = structType.Elem()
+	}
 	if _, ok := structTypeOfStruct[structType]; !ok {
 		structTypeOfStruct[structType] = &identityStruct{
 			structType: structType,
