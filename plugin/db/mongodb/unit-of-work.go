@@ -38,6 +38,9 @@ func (m *unitOfWork) Commit() error {
 func (m *unitOfWork) commitAdd(ctx mongo.SessionContext) (err error) {
 	underscore.Chain(m.addQueue).Map(func(r identity.IIdentity, _ int) error {
 		entryValue := reflect.ValueOf(r)
+		if entryValue.Kind() == reflect.Ptr {
+			entryValue = entryValue.Elem()
+		}
 		s := identity.NewStruct(
 			entryValue.Type(),
 		)
@@ -64,6 +67,9 @@ func (m *unitOfWork) commitAdd(ctx mongo.SessionContext) (err error) {
 func (m *unitOfWork) commitRemove(ctx mongo.SessionContext) (err error) {
 	underscore.Chain(m.removeQueue).Map(func(r identity.IIdentity, _ int) error {
 		entryValue := reflect.ValueOf(r)
+		if entryValue.Kind() == reflect.Ptr {
+			entryValue = entryValue.Elem()
+		}
 		s := identity.NewStruct(
 			entryValue.Type(),
 		)
@@ -91,6 +97,9 @@ func (m *unitOfWork) commitRemove(ctx mongo.SessionContext) (err error) {
 func (m *unitOfWork) commitSave(ctx mongo.SessionContext) (err error) {
 	underscore.Chain(m.saveQueue).Map(func(r identity.IIdentity, _ int) error {
 		entryValue := reflect.ValueOf(r)
+		if entryValue.Kind() == reflect.Ptr {
+			entryValue = entryValue.Elem()
+		}
 		s := identity.NewStruct(
 			entryValue.Type(),
 		)
