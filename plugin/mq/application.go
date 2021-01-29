@@ -38,7 +38,8 @@ func (m application) Run() {
 	)
 	fmt.Println(
 		fmt.Sprintf(
-			"启动于%s",
+			"%s启动于%s",
+			m.project,
 			time.Now().Format("2006-01-02 15:04:05"),
 		),
 	)

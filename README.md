@@ -1,7 +1,8 @@
-# ![Version](https://img.shields.io/badge/version-0.0.48-green.svg)
+# ![Version](https://img.shields.io/badge/version-0.0.49-green.svg)
 
 ## 结构
 * api - api相关
+* cryptoex - 加密相关
 * dp - 设计模式
 * ioex - io扩展
   * ioos - 系统文件
