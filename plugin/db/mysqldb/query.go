@@ -48,7 +48,15 @@ func (m *query) ToArray(dst interface{}) (err error) {
 		return
 	}
 
-	err = m.DB.Select(dst, sql, m.Option.WhereArgs...)
+	if dstValue, ok := dst.(reflect.Value); ok {
+		var temp = dstValue.Interface()
+		err = m.DB.Select(temp, sql, m.Option.WhereArgs...)
+		dstValue.Elem().Set(
+			reflect.ValueOf(temp).Elem(),
+		)
+	} else {
+		err = m.DB.Select(dst, sql, m.Option.WhereArgs...)
+	}
 	return
 }
 

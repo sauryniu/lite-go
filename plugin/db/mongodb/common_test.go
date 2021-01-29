@@ -19,7 +19,7 @@ var (
 )
 
 type testModel struct {
-	ID   string `db:"_id,user" bson:"_id"`
+	ID   string `alias:"user" bson:"_id" db:"_id"`
 	Name string `db:"name"`
 	Age  int
 }

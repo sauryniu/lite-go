@@ -321,6 +321,45 @@ func Test_query_ToArray_限制(t *testing.T) {
 	assert.EqualValues(t, res, actual)
 }
 
+func Test_query_ToArray_DstIsReflectValue(t *testing.T) {
+	uow := &unitOfWork{
+		DB:    sqlxDB,
+		Items: make([]unitOfWorkItem, 0),
+	}
+	var entries []testModel
+	underscore.Range(0, 4, 1).Map(func(r int, _ int) testModel {
+		entry := testModel{
+			ID:   fmt.Sprintf("id-%d", r),
+			Name: fmt.Sprintf("name-%d", r),
+			Age:  10 + r,
+		}
+		uow.RegisterAdd(entry)
+		return entry
+	}).Value(&entries)
+
+	uow.Commit()
+
+	self := &query{
+		DB:        sqlxDB,
+		ModelType: reflect.TypeOf(entries[0]),
+		Option: queryOption{
+			Orders: make([]orderOption, 0),
+		},
+	}
+	var res []testModel
+	err := self.ToArray(
+		reflect.ValueOf(&res),
+	)
+
+	underscore.Chain(entries).Each(func(r testModel, _ int) {
+		uow.RegisterRemove(r)
+	})
+	uow.Commit()
+
+	assert.Nil(t, err)
+	assert.EqualValues(t, res, entries)
+}
+
 func Test_query_Where(t *testing.T) {
 	self := &query{
 		DB: sqlxDB,

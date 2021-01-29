@@ -91,7 +91,12 @@ func (m *query) ToArray(dst interface{}) error {
 			value.Elem(),
 		)
 	}
-	reflect.ValueOf(dst).Elem().Set(sliceValue)
+	var dstValue reflect.Value
+	var ok bool
+	if dstValue, ok = dst.(reflect.Value); !ok {
+		dstValue = reflect.ValueOf(dst)
+	}
+	dstValue.Elem().Set(sliceValue)
 	return nil
 }
 

@@ -10,7 +10,7 @@ const connString = "root:123456@tcp(10.1.30.67:3306)/go-test?charset=utf8"
 var sqlxDB *sqlx.DB
 
 type testModel struct {
-	ID   string `db:"id" alias:"user"`
+	ID   string `alias:"user" db:"id"`
 	Name string `db:"name"`
 	Age  int    `db:"age"`
 }
