@@ -1,13 +1,12 @@
-package goredis
+package redisex
 
 import (
 	"github.com/ahl5esoft/lite-go/plugin/mq"
-	"github.com/ahl5esoft/lite-go/plugin/redisex"
 	"github.com/go-redis/redis"
 )
 
 type redisMQ struct {
-	Redis redisex.IRedis
+	Redis IRedis
 }
 
 func (m redisMQ) Publish(channel string, message interface{}) error {
@@ -25,7 +24,7 @@ func (m redisMQ) Subscribe(channel string, message chan<- string) {
 }
 
 // NewMQ is 创建reis消息队列
-func NewMQ(r redisex.IRedis) mq.IMQ {
+func NewMQ(r IRedis) mq.IMQ {
 	return &redisMQ{
 		Redis: r,
 	}
