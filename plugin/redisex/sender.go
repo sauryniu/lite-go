@@ -1,4 +1,4 @@
-package mq
+package redisex
 
 import (
 	"fmt"
@@ -8,17 +8,18 @@ import (
 	"github.com/ahl5esoft/lite-go/errorex"
 	"github.com/ahl5esoft/lite-go/netex"
 	"github.com/ahl5esoft/lite-go/object"
+	"github.com/ahl5esoft/lite-go/plugin/pubsub"
 	jsoniter "github.com/json-iterator/go"
 )
 
 const emptyJSON = `{}`
 
-type sendResponse struct {
+type senderSendResponse struct {
 	Data    api.Response
 	ReplyID string
 }
 
-type sendRequest struct {
+type senderSendRequest struct {
 	API      string
 	Body     string
 	Endpoint string
@@ -26,8 +27,8 @@ type sendRequest struct {
 }
 
 type sender struct {
-	idGenerator  object.IStringGenerator
-	messageQueue IMQ
+	idGenerator object.IStringGenerator
+	redis       IRedis
 }
 
 func (m sender) Send(route string, body interface{}) (err error) {
@@ -37,14 +38,15 @@ func (m sender) Send(route string, body interface{}) (err error) {
 	}
 
 	routeParams := strings.Split(route, "/")
-	return m.messageQueue.Publish(
+	_, err = m.redis.Publish(
 		fmt.Sprintf("%s-in", routeParams[0]),
-		sendRequest{
+		senderSendRequest{
 			API:      routeParams[2],
 			Body:     bodyJSON,
 			Endpoint: routeParams[1],
 		},
 	)
+	return
 }
 
 func (m sender) SendAndReceive(route string, body interface{}) (res interface{}, err error) {
@@ -54,28 +56,31 @@ func (m sender) SendAndReceive(route string, body interface{}) (res interface{},
 	}
 
 	routeParams := strings.Split(route, "/")
-	req := sendRequest{
+	outChannel := fmt.Sprintf("%s-out", routeParams[0])
+	subMsg := make(chan pubsub.Message)
+	m.redis.Subscribe([]string{outChannel}, subMsg)
+
+	req := senderSendRequest{
 		API:      routeParams[2],
 		Body:     bodyJSON,
 		Endpoint: routeParams[1],
 		ReplyID:  m.idGenerator.Generate(),
 	}
-
-	respMessage := make(chan string)
-	m.messageQueue.Subscribe(
-		fmt.Sprintf("%s-out", routeParams[0]),
-		respMessage,
-	)
-
-	go m.messageQueue.Publish(
+	fmt.Println(req)
+	m.redis.Publish(
 		fmt.Sprintf("%s-in", routeParams[0]),
 		req,
 	)
 
-	var resp sendResponse
+	var resp senderSendResponse
 	for {
-		jsoniter.UnmarshalFromString(<-respMessage, &resp)
+		jsoniter.UnmarshalFromString(
+			(<-subMsg).Text,
+			&resp,
+		)
+		fmt.Println(resp)
 		if resp.ReplyID == req.ReplyID {
+			m.redis.Unsubscribe(outChannel)
 			break
 		}
 	}
@@ -98,10 +103,10 @@ func (m sender) getBodyJSON(body interface{}) (string, error) {
 	return jsoniter.MarshalToString(body)
 }
 
-// NewSender is 消息队列发送者
-func NewSender(messageQueue IMQ, idGenerator object.IStringGenerator) netex.ISender {
+// NewSender is redis发送者
+func NewSender(redis IRedis, idGenerator object.IStringGenerator) netex.ISender {
 	return &sender{
-		idGenerator:  idGenerator,
-		messageQueue: messageQueue,
+		idGenerator: idGenerator,
+		redis:       redis,
 	}
 }
