@@ -10,7 +10,11 @@ import (
 	jsoniter "github.com/json-iterator/go"
 )
 
-const emptyJSON = `{}`
+const (
+	emptyJSON                 = `{}`
+	apiCallerPubChannelFormat = "%s-in"
+	apiCallerSubChannelFormat = "%s-out"
+)
 
 type apiCaller struct {
 	idGenerator object.IStringGenerator
@@ -25,7 +29,7 @@ func (m apiCaller) Call(route string, body interface{}) (res interface{}, err er
 	}
 
 	routeParams := strings.Split(route, "/")
-	subChannel := fmt.Sprintf(subChannelFormat, routeParams[0])
+	subChannel := fmt.Sprintf(apiCallerSubChannelFormat, routeParams[0])
 	subMsg := make(chan Message)
 	m.sub.Subscribe([]string{subChannel}, subMsg)
 
@@ -36,7 +40,7 @@ func (m apiCaller) Call(route string, body interface{}) (res interface{}, err er
 		ReplyID:  m.idGenerator.Generate(),
 	}
 	m.pub.Publish(
-		fmt.Sprintf(pubChannelFormat, routeParams[0]),
+		fmt.Sprintf(apiCallerPubChannelFormat, routeParams[0]),
 		req,
 	)
 
@@ -70,7 +74,7 @@ func (m apiCaller) VoidCall(route string, body interface{}) (err error) {
 
 	routeParams := strings.Split(route, "/")
 	_, err = m.pub.Publish(
-		fmt.Sprintf(pubChannelFormat, routeParams[0]),
+		fmt.Sprintf(apiCallerPubChannelFormat, routeParams[0]),
 		requestMessage{
 			API:      routeParams[2],
 			Body:     bodyJSON,

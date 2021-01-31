@@ -7,20 +7,22 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_New_Invalid(t *testing.T) {
-	endpoint := "endpoint"
-	name := "name"
-	res := New(endpoint, name)
-	assert.Equal(t, res, invalid)
+func Test_factory_Build(t *testing.T) {
+	t.Run("Invalid", func(t *testing.T) {
+		endpoint := "endpoint"
+		name := "name"
+		res := factoryInstane.Build(endpoint, name)
+		assert.Equal(t, res, invalid)
+	})
 }
 
 func Test_Register(t *testing.T) {
 	endpoint := "endpoint"
 	name := "name"
 	Register(endpoint, name, invalid)
-	defer delete(metadatas, endpoint)
+	defer delete(factoryInstane, endpoint)
 
-	apiTypes, ok := metadatas[endpoint]
+	apiTypes, ok := factoryInstane[endpoint]
 	assert.True(t, ok)
 
 	apiType, ok := apiTypes[name]

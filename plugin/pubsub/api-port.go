@@ -10,17 +10,23 @@ import (
 	jsoniter "github.com/json-iterator/go"
 )
 
-type listener struct {
-	project  string
-	subMsg   chan Message
-	pub      IPublisher
-	sub      ISubscriber
-	validate *validator.Validate
+const (
+	apiPortPubChannelFormat = "%s-out"
+	apiPortSubChannelFormat = "%s-in"
+)
+
+type apiPort struct {
+	apiFactory api.IFactory
+	project    string
+	pub        IPublisher
+	sub        ISubscriber
+	subMsg     chan Message
+	validate   *validator.Validate
 }
 
-func (m listener) Listen() {
+func (m apiPort) Listen() {
 	m.sub.Subscribe([]string{
-		fmt.Sprintf(subChannelFormat, m.project),
+		fmt.Sprintf(apiPortSubChannelFormat, m.project),
 	}, m.subMsg)
 	fmt.Println(
 		m.project,
@@ -29,14 +35,14 @@ func (m listener) Listen() {
 	)
 
 	for {
-		m.receive()
+		m.handle()
 	}
 }
 
-func (m listener) receive() {
+func (m apiPort) handle() {
 	subMsg := <-m.subMsg
 	var err error
-	var msg responseMessage
+	var msg requestMessage
 	if err = jsoniter.UnmarshalFromString(subMsg.Text, &msg); err != nil {
 		return
 	}
@@ -69,15 +75,15 @@ func (m listener) receive() {
 		}
 
 		m.pub.Publish(
-			fmt.Sprintf(pubChannelFormat, m.project),
-			replyMessage{
+			fmt.Sprintf(apiPortPubChannelFormat, m.project),
+			responseMessage{
 				Data:    resp,
 				ReplyID: msg.ReplyID,
 			},
 		)
 	}()
 
-	apiInstance := api.New(msg.Endpoint, msg.API)
+	apiInstance := m.apiFactory.Build(msg.Endpoint, msg.API)
 	jsoniter.UnmarshalFromString(msg.Body, apiInstance)
 	if err = m.validate.Struct(apiInstance); err != nil {
 		err = errorex.New(errorex.VerifyCode, "")
@@ -88,11 +94,12 @@ func (m listener) receive() {
 }
 
 // NewPort is 发布订阅端口
-func NewPort(project string, sub ISubscriber, pub IPublisher) api.IPort {
-	return &listener{
-		project:  project,
-		pub:      pub,
-		sub:      sub,
-		validate: validator.New(),
+func NewPort(project string, sub ISubscriber, pub IPublisher, apiFactory api.IFactory) api.IPort {
+	return &apiPort{
+		apiFactory: apiFactory,
+		project:    project,
+		pub:        pub,
+		sub:        sub,
+		validate:   validator.New(),
 	}
 }

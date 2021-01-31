@@ -1,4 +1,4 @@
-package redisex
+package pubsub
 
 import (
 	"testing"
@@ -7,25 +7,25 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_sender_Send(t *testing.T) {
+func Test_apiCaller_VoidCall(t *testing.T) {
 	t.Run("ok", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		self := new(sender)
+		self := new(apiCaller)
 		route := "a/b/c"
 		body := []int{1, 2, 3}
 
-		mockRedis := NewMockIRedis(ctrl)
-		self.redis = mockRedis
+		mockPub := NewMockIPublisher(ctrl)
+		self.pub = mockPub
 
-		mockRedis.EXPECT().Publish("a-in", senderSendRequest{
+		mockPub.EXPECT().Publish("a-in", requestMessage{
 			API:      "c",
 			Body:     `[1,2,3]`,
 			Endpoint: "b",
 		})
 
-		err := self.Send(route, body)
+		err := self.VoidCall(route, body)
 		assert.NoError(t, err)
 	})
 
@@ -33,19 +33,19 @@ func Test_sender_Send(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		self := new(sender)
+		self := new(apiCaller)
 		route := "a/b/c"
 
-		mockRedis := NewMockIRedis(ctrl)
-		self.redis = mockRedis
+		mockPub := NewMockIPublisher(ctrl)
+		self.pub = mockPub
 
-		mockRedis.EXPECT().Publish("a-in", senderSendRequest{
+		mockPub.EXPECT().Publish("a-in", requestMessage{
 			API:      "c",
 			Body:     `{}`,
 			Endpoint: "b",
 		})
 
-		err := self.Send(route, nil)
+		err := self.VoidCall(route, nil)
 		assert.NoError(t, err)
 	})
 }
