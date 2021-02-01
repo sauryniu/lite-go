@@ -9,11 +9,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_caller_Get(t *testing.T) {
+func Test_apiCaller_Get(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	self := new(sessionCaller)
+	self := new(apiCaller)
 	self.getRoute = "get"
 	key := "key"
 
@@ -32,11 +32,11 @@ func Test_caller_Get(t *testing.T) {
 	assert.Equal(t, s.Name, "hello")
 }
 
-func Test_caller_Set(t *testing.T) {
+func Test_apiCaller_Set(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	self := new(sessionCaller)
+	self := new(apiCaller)
 	self.setRoute = "sr"
 	body := []int{1, 2, 3}
 	expires := 5 * time.Second

@@ -16,13 +16,13 @@ type setMessage struct {
 	Value             string
 }
 
-type sessionCaller struct {
+type apiCaller struct {
 	api.ICaller
 
 	getRoute, setRoute string
 }
 
-func (m sessionCaller) Get(k string, v interface{}) error {
+func (m apiCaller) Get(k string, v interface{}) error {
 	res, err := m.ICaller.Call(m.getRoute, getMessage{
 		Key: k,
 	})
@@ -36,7 +36,7 @@ func (m sessionCaller) Get(k string, v interface{}) error {
 	)
 }
 
-func (m sessionCaller) Set(body interface{}, expires, interval time.Duration) (string, error) {
+func (m apiCaller) Set(body interface{}, expires, interval time.Duration) (string, error) {
 	bodyJSON, err := jsoniter.MarshalToString(body)
 	if err != nil {
 		return "", err
@@ -59,9 +59,9 @@ func (m sessionCaller) Set(body interface{}, expires, interval time.Duration) (s
 	return res.(string), nil
 }
 
-// NewCaller is 创建会话调用
-func NewCaller(caller api.ICaller, getRoute, setRoute string) ICaller {
-	return &sessionCaller{
+// NewAPICaller is 创建会话调用
+func NewAPICaller(caller api.ICaller, getRoute, setRoute string) IAPICaller {
+	return &apiCaller{
 		ICaller:  caller,
 		getRoute: getRoute,
 		setRoute: setRoute,
