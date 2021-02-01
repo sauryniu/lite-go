@@ -93,8 +93,8 @@ func (m apiPort) handle() {
 	resp.Data, err = apiInstance.Call()
 }
 
-// NewPort is 发布订阅端口
-func NewPort(project string, sub ISubscriber, pub IPublisher, apiFactory api.IFactory) api.IPort {
+// NewAPIPort is 发布订阅端口
+func NewAPIPort(project string, sub ISubscriber, pub IPublisher, apiFactory api.IFactory) api.IPort {
 	return &apiPort{
 		apiFactory: apiFactory,
 		project:    project,

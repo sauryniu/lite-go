@@ -92,8 +92,8 @@ func (m apiCaller) getBodyJSON(body interface{}) (string, error) {
 	return jsoniter.MarshalToString(body)
 }
 
-// NewCaller is redis api 调用
-func NewCaller(pub IPublisher, sub ISubscriber, idGenerator object.IStringGenerator) api.ICaller {
+// NewAPICaller is redis api 调用
+func NewAPICaller(pub IPublisher, sub ISubscriber, idGenerator object.IStringGenerator) api.ICaller {
 	return &apiCaller{
 		idGenerator: idGenerator,
 		pub:         pub,
