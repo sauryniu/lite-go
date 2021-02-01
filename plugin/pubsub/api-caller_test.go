@@ -49,3 +49,31 @@ func Test_apiCaller_VoidCall(t *testing.T) {
 		assert.NoError(t, err)
 	})
 }
+
+func Test_apiCaller_getBodyString(t *testing.T) {
+	t.Run("nil", func(t *testing.T) {
+		res, err := new(apiCaller).getBodyString(nil)
+		assert.NoError(t, err)
+		assert.Equal(t, res, emptyJSON)
+	})
+
+	t.Run("string", func(t *testing.T) {
+		res, err := new(apiCaller).getBodyString("str")
+		assert.NoError(t, err)
+		assert.Equal(t, res, "str")
+	})
+
+	t.Run("[]byte", func(t *testing.T) {
+		res, err := new(apiCaller).getBodyString(
+			[]byte("byte"),
+		)
+		assert.NoError(t, err)
+		assert.Equal(t, res, "byte")
+	})
+
+	t.Run("array", func(t *testing.T) {
+		res, err := new(apiCaller).getBodyString([]int{1, 2, 3})
+		assert.NoError(t, err)
+		assert.Equal(t, res, "[1,2,3]")
+	})
+}

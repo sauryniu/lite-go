@@ -24,7 +24,7 @@ type apiCaller struct {
 
 func (m apiCaller) Call(route string, body interface{}) (res interface{}, err error) {
 	var bodyJSON string
-	if bodyJSON, err = m.getBodyJSON(body); err != nil {
+	if bodyJSON, err = m.getBodyString(body); err != nil {
 		return
 	}
 
@@ -68,7 +68,7 @@ func (m apiCaller) Call(route string, body interface{}) (res interface{}, err er
 
 func (m apiCaller) VoidCall(route string, body interface{}) (err error) {
 	var bodyJSON string
-	if bodyJSON, err = m.getBodyJSON(body); err != nil {
+	if bodyJSON, err = m.getBodyString(body); err != nil {
 		return
 	}
 
@@ -84,9 +84,17 @@ func (m apiCaller) VoidCall(route string, body interface{}) (err error) {
 	return
 }
 
-func (m apiCaller) getBodyJSON(body interface{}) (string, error) {
+func (m apiCaller) getBodyString(body interface{}) (string, error) {
 	if body == nil {
 		return emptyJSON, nil
+	}
+
+	if s, ok := body.(string); ok {
+		return s, nil
+	}
+
+	if bf, ok := body.([]byte); ok {
+		return string(bf), nil
 	}
 
 	return jsoniter.MarshalToString(body)
