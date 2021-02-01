@@ -65,6 +65,13 @@ func NewPostOption(apiFactory api.IFactory, validate *validator.Validate) APIPor
 	}
 }
 
+// NewMiddlewareOption is 中间件选项
+func NewMiddlewareOption(handlerFuncs ...gin.HandlerFunc) APIPortOption {
+	return func(app *gin.Engine) {
+		app.Use(handlerFuncs...)
+	}
+}
+
 // NewRunOption is 监听运行选项
 func NewRunOption(port int) APIPortOption {
 	return func(app *gin.Engine) {
