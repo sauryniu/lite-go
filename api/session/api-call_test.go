@@ -1,6 +1,7 @@
 package session
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -14,15 +15,18 @@ func Test_apiCaller_Get(t *testing.T) {
 	defer ctrl.Finish()
 
 	self := new(apiCaller)
-	self.getRoute = "get"
+	self.app = "ss"
 	key := "key"
 
 	mockCaller := api.NewMockICaller(ctrl)
 	self.ICaller = mockCaller
 
-	mockCaller.EXPECT().Call(self.getRoute, getMessage{
-		Key: key,
-	}).Return(`{"name":"hello"}`, nil)
+	mockCaller.EXPECT().Call(
+		fmt.Sprintf(getRouteFormat, self.app),
+		getMessage{
+			Key: key,
+		},
+	).Return(`{"name":"hello"}`, nil)
 
 	var s struct {
 		Name string
@@ -37,7 +41,7 @@ func Test_apiCaller_Set(t *testing.T) {
 	defer ctrl.Finish()
 
 	self := new(apiCaller)
-	self.setRoute = "sr"
+	self.app = "ss"
 	body := []int{1, 2, 3}
 	expires := 5 * time.Second
 	key := "key"
@@ -45,11 +49,14 @@ func Test_apiCaller_Set(t *testing.T) {
 	mockCaller := api.NewMockICaller(ctrl)
 	self.ICaller = mockCaller
 
-	mockCaller.EXPECT().Call(self.setRoute, setMessage{
-		Expires:  5,
-		Interval: 0,
-		Value:    `[1,2,3]`,
-	}).Return(key, nil)
+	mockCaller.EXPECT().Call(
+		fmt.Sprintf(setRouteFormat, self.app),
+		setMessage{
+			Expires:  5,
+			Interval: 0,
+			Value:    `[1,2,3]`,
+		},
+	).Return(key, nil)
 
 	res, err := self.Set(body, expires, time.Nanosecond)
 	assert.NoError(t, err)

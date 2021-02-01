@@ -1,10 +1,16 @@
 package session
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/ahl5esoft/lite-go/api"
 	jsoniter "github.com/json-iterator/go"
+)
+
+const (
+	getRouteFormat = "%s/server/get"
+	setRouteFormat = "%s/server/set"
 )
 
 type getMessage struct {
@@ -19,13 +25,16 @@ type setMessage struct {
 type apiCaller struct {
 	api.ICaller
 
-	getRoute, setRoute string
+	app string
 }
 
 func (m apiCaller) Get(k string, v interface{}) error {
-	res, err := m.ICaller.Call(m.getRoute, getMessage{
-		Key: k,
-	})
+	res, err := m.ICaller.Call(
+		fmt.Sprintf(getRouteFormat, m.app),
+		getMessage{
+			Key: k,
+		},
+	)
 	if err != nil {
 		return err
 	}
@@ -47,11 +56,14 @@ func (m apiCaller) Set(body interface{}, expires, interval time.Duration) (strin
 		intervalCount = int(interval / time.Second)
 	}
 
-	res, err := m.ICaller.Call(m.setRoute, setMessage{
-		Expires:  int(expires / time.Second),
-		Interval: intervalCount,
-		Value:    bodyJSON,
-	})
+	res, err := m.ICaller.Call(
+		fmt.Sprintf(setRouteFormat, m.app),
+		setMessage{
+			Expires:  int(expires / time.Second),
+			Interval: intervalCount,
+			Value:    bodyJSON,
+		},
+	)
 	if err != nil {
 		return "", err
 	}
@@ -60,10 +72,9 @@ func (m apiCaller) Set(body interface{}, expires, interval time.Duration) (strin
 }
 
 // NewAPICaller is 创建会话调用
-func NewAPICaller(caller api.ICaller, getRoute, setRoute string) IAPICaller {
+func NewAPICaller(caller api.ICaller, app string) IAPICaller {
 	return &apiCaller{
-		ICaller:  caller,
-		getRoute: getRoute,
-		setRoute: setRoute,
+		ICaller: caller,
+		app:     app,
 	}
 }
