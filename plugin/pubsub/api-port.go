@@ -10,11 +10,6 @@ import (
 	jsoniter "github.com/json-iterator/go"
 )
 
-const (
-	apiPortPubChannelFormat = "%s-out"
-	apiPortSubChannelFormat = "%s-in"
-)
-
 type apiPort struct {
 	apiFactory api.IFactory
 	project    string
@@ -25,9 +20,7 @@ type apiPort struct {
 }
 
 func (m apiPort) Listen() {
-	m.sub.Subscribe([]string{
-		fmt.Sprintf(apiPortSubChannelFormat, m.project),
-	}, m.subMsg)
+	m.sub.Subscribe([]string{m.project}, m.subMsg)
 	fmt.Println(
 		m.project,
 		"启动于",
@@ -41,9 +34,10 @@ func (m apiPort) Listen() {
 
 func (m apiPort) handle() {
 	subMsg := <-m.subMsg
+
 	var err error
-	var msg requestMessage
-	if err = jsoniter.UnmarshalFromString(subMsg.Text, &msg); err != nil {
+	var req apiMessage
+	if err = jsoniter.UnmarshalFromString(subMsg.Text, &req); err != nil {
 		return
 	}
 
@@ -63,28 +57,22 @@ func (m apiPort) handle() {
 				resp.Error = cErr.Code
 				resp.Data = cErr.Error()
 			} else {
-				fmt.Println(
-					fmt.Sprintf("%v", err),
-				)
 				resp.Error = errorex.PanicCode
 			}
 		}
 
-		if msg.ReplyID == "" {
+		if req.ReplyID == "" {
 			return
 		}
 
 		m.pub.Publish(
-			fmt.Sprintf(apiPortPubChannelFormat, m.project),
-			responseMessage{
-				Data:    resp,
-				ReplyID: msg.ReplyID,
-			},
+			fmt.Sprintf("%s-%s", m.project, req.ReplyID),
+			resp,
 		)
 	}()
 
-	apiInstance := m.apiFactory.Build(msg.Endpoint, msg.API)
-	jsoniter.UnmarshalFromString(msg.Body, apiInstance)
+	apiInstance := m.apiFactory.Build(req.Endpoint, req.API)
+	jsoniter.UnmarshalFromString(req.Body, apiInstance)
 	if err = m.validate.Struct(apiInstance); err != nil {
 		err = errorex.New(errorex.VerifyCode, "")
 		return
@@ -100,6 +88,7 @@ func NewAPIPort(project string, sub ISubscriber, pub IPublisher, apiFactory api.
 		project:    project,
 		pub:        pub,
 		sub:        sub,
+		subMsg:     make(chan Message),
 		validate:   validator.New(),
 	}
 }

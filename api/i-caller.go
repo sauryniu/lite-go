@@ -2,8 +2,10 @@
 
 package api
 
+import "time"
+
 // ICaller is api调用接口
 type ICaller interface {
-	Call(route string, body interface{}) (interface{}, error)
+	Call(route string, body interface{}, expires time.Duration) (interface{}, error)
 	VoidCall(route string, body interface{}) error
 }

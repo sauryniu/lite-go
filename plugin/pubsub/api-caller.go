@@ -3,6 +3,7 @@ package pubsub
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/ahl5esoft/lite-go/api"
 	"github.com/ahl5esoft/lite-go/errorex"
@@ -10,11 +11,7 @@ import (
 	jsoniter "github.com/json-iterator/go"
 )
 
-const (
-	emptyJSON                 = `{}`
-	apiCallerPubChannelFormat = "%s-in"
-	apiCallerSubChannelFormat = "%s-out"
-)
+const emptyJSON = `{}`
 
 type apiCaller struct {
 	idGenerator object.IStringGenerator
@@ -22,48 +19,43 @@ type apiCaller struct {
 	sub         ISubscriber
 }
 
-func (m apiCaller) Call(route string, body interface{}) (res interface{}, err error) {
+func (m apiCaller) Call(route string, body interface{}, expires time.Duration) (res interface{}, err error) {
 	var bodyJSON string
 	if bodyJSON, err = m.getBodyString(body); err != nil {
 		return
 	}
 
 	routeParams := strings.Split(route, "/")
-	subChannel := fmt.Sprintf(apiCallerSubChannelFormat, routeParams[0])
-	subMsg := make(chan Message)
-	m.sub.Subscribe([]string{subChannel}, subMsg)
-
-	req := requestMessage{
+	req := apiMessage{
 		API:      routeParams[2],
 		Body:     bodyJSON,
 		Endpoint: routeParams[1],
 		ReplyID:  m.idGenerator.Generate(),
 	}
-	m.pub.Publish(
-		fmt.Sprintf(apiCallerPubChannelFormat, routeParams[0]),
-		req,
-	)
+	subChannel := fmt.Sprintf("%s-%s", routeParams[0], req.ReplyID)
+	subMsg := make(chan Message)
+	m.sub.Subscribe([]string{subChannel}, subMsg)
+	defer m.sub.Unsubscribe(subChannel)
 
-	var resp responseMessage
-	for {
-		jsoniter.UnmarshalFromString(
-			(<-subMsg).Text,
-			&resp,
-		)
-		if resp.ReplyID == req.ReplyID {
-			m.sub.Unsubscribe(subChannel)
-			break
-		}
+	m.pub.Publish(routeParams[0], req)
+
+	var resp api.Response
+	select {
+	case <-time.After(expires):
+		resp.Data = ""
+		resp.Error = errorex.PanicCode
+	case msg := <-subMsg:
+		jsoniter.UnmarshalFromString(msg.Text, &resp)
 	}
 
-	if resp.Data.Error != 0 {
+	if resp.Error != 0 {
 		return nil, errorex.New(
-			resp.Data.Error,
-			resp.Data.Data.(string),
+			resp.Error,
+			resp.Data.(string),
 		)
 	}
 
-	return resp.Data.Data, nil
+	return resp.Data, nil
 }
 
 func (m apiCaller) VoidCall(route string, body interface{}) (err error) {
@@ -73,14 +65,11 @@ func (m apiCaller) VoidCall(route string, body interface{}) (err error) {
 	}
 
 	routeParams := strings.Split(route, "/")
-	_, err = m.pub.Publish(
-		fmt.Sprintf(apiCallerPubChannelFormat, routeParams[0]),
-		requestMessage{
-			API:      routeParams[2],
-			Body:     bodyJSON,
-			Endpoint: routeParams[1],
-		},
-	)
+	_, err = m.pub.Publish(routeParams[0], apiMessage{
+		API:      routeParams[2],
+		Body:     bodyJSON,
+		Endpoint: routeParams[1],
+	})
 	return
 }
 

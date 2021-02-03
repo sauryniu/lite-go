@@ -26,6 +26,7 @@ func Test_apiCaller_Get(t *testing.T) {
 		getMessage{
 			Key: key,
 		},
+		5*time.Second,
 	).Return(`{"name":"hello"}`, nil)
 
 	var s struct {
@@ -56,6 +57,7 @@ func Test_apiCaller_Set(t *testing.T) {
 			Interval: 0,
 			Value:    `[1,2,3]`,
 		},
+		5*time.Second,
 	).Return(key, nil)
 
 	res, err := self.Set(body, expires, time.Nanosecond)

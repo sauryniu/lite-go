@@ -34,20 +34,18 @@ func Test_apiPort_handle(t *testing.T) {
 			new(testAPI),
 		)
 
+		replyID := "r-id"
 		mockPub.EXPECT().Publish(
-			fmt.Sprintf(apiPortPubChannelFormat, self.project),
-			responseMessage{
-				Data: api.Response{
-					Data:  "ok",
-					Error: 0,
-				},
-				ReplyID: "rid",
+			fmt.Sprintf("%s-%s", self.project, replyID),
+			api.Response{
+				Data:  "ok",
+				Error: 0,
 			},
 		)
 
 		go func() {
 			self.subMsg <- Message{
-				Text: `{"API":"api","Body":"{}","Endpoint":"endpoint","ReplyID":"rid"}`,
+				Text: fmt.Sprintf(`{"API":"api","Body":"{}","Endpoint":"endpoint","ReplyID":"%s"}`, replyID),
 			}
 		}()
 

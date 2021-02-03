@@ -1,9 +1,12 @@
 package goredis
 
 import (
+	"fmt"
+	"sync"
 	"testing"
 	"time"
 
+	underscore "github.com/ahl5esoft/golang-underscore"
 	"github.com/ahl5esoft/lite-go/plugin/pubsub"
 	"github.com/go-redis/redis"
 	"github.com/stretchr/testify/assert"
@@ -334,24 +337,63 @@ func Test_goRedis_Set(t *testing.T) {
 }
 
 func Test_goRedis_Subscribe(t *testing.T) {
-	channel := "Test_goRedis_Subscribe"
-	msg := make(chan pubsub.Message)
-	defer close(msg)
-	self.Subscribe([]string{channel}, msg)
+	t.Run("once", func(t *testing.T) {
+		channel := "Test_goRedis_Subscribe-once"
+		msg := make(chan pubsub.Message)
+		self.Subscribe([]string{channel}, msg)
 
-	message := "hello"
-	count, err := client.Publish(channel, message).Result()
-	assert.NoError(t, err)
-	assert.Equal(
-		t,
-		count,
-		int64(1),
-	)
-	assert.Equal(
-		t,
-		(<-msg).Text,
-		message,
-	)
+		message := "hello"
+		count, err := client.Publish(channel, message).Result()
+		assert.NoError(t, err)
+		assert.Equal(
+			t,
+			count,
+			int64(1),
+		)
+		assert.Equal(
+			t,
+			(<-msg).Text,
+			message,
+		)
+	})
+
+	t.Run("twice", func(t *testing.T) {
+		channel := "Test_goRedis_Subscribe-twice"
+		msg := make(chan pubsub.Message)
+		defer close(msg)
+		self.Subscribe([]string{channel}, msg)
+
+		wg := sync.WaitGroup{}
+		messages := []string{"hello", "world"}
+		wg.Add(
+			len(messages),
+		)
+
+		res := make([]string, 0)
+		go func() {
+			for {
+				res = append(
+					res,
+					(<-msg).Text,
+				)
+				fmt.Println("receive", res)
+				wg.Done()
+			}
+		}()
+
+		underscore.Chain(messages).Each(func(r string, _ int) {
+			count, err := client.Publish(channel, r).Result()
+			assert.NoError(t, err)
+			assert.Equal(
+				t,
+				count,
+				int64(1),
+			)
+		})
+
+		wg.Wait()
+		assert.Equal(t, res, messages)
+	})
 }
 
 func Test_goRedis_Unsubscribe(t *testing.T) {

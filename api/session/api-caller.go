@@ -34,6 +34,7 @@ func (m apiCaller) Get(k string, v interface{}) error {
 		getMessage{
 			Key: k,
 		},
+		5*time.Second,
 	)
 	if err != nil {
 		return err
@@ -63,6 +64,7 @@ func (m apiCaller) Set(body interface{}, expires, interval time.Duration) (strin
 			Interval: intervalCount,
 			Value:    bodyJSON,
 		},
+		5*time.Second,
 	)
 	if err != nil {
 		return "", err
