@@ -4,5 +4,7 @@ package cor
 type IHandler interface {
 	Break()
 	Handle() error
-	SetNext(handler IHandler) IHandler
+	IsBreak() bool
+	SetDelayNext(NewFunc) IHandler
+	SetNext(IHandler) IHandler
 }
