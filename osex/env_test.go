@@ -11,7 +11,7 @@ import (
 func Test_osEnv_Get_string(t *testing.T) {
 	k := "GOPATH"
 	var res string
-	NewOSEnv().Get(k, &res)
+	NewEnv().Get(k, &res)
 	assert.Equal(
 		t,
 		res,
@@ -26,6 +26,6 @@ func Test_osEnv_Get_Array(t *testing.T) {
 	os.Setenv(k, s)
 
 	var res []int
-	NewOSEnv().Get(k, &res)
+	NewEnv().Get(k, &res)
 	assert.EqualValues(t, res, src)
 }

@@ -1,37 +1,28 @@
-package ioos
+package osex
 
 import (
 	"io/ioutil"
 	"os"
 	"testing"
 
-	"github.com/ahl5esoft/lite-go/ioex"
-	"github.com/ahl5esoft/lite-go/ioex/iopath"
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_Build_目录(t *testing.T) {
-	_, isDir := Build("a", "b").(ioex.IDirectory)
-	assert.True(t, isDir)
-}
-
-func Test_Build_文件(t *testing.T) {
-	_, isFile := Build("a", "b.txt").(ioex.IFile)
-	assert.True(t, isFile)
-}
-
-func Test_node_GetName_Dir(t *testing.T) {
-	res := newNode("a", "b", "c").GetName()
+func Test_ioNode_GetName_Dir(t *testing.T) {
+	ioPath := NewIOPath()
+	res := newIONode(ioPath, "a", "b", "c").GetName()
 	assert.Equal(t, res, "c")
 }
 
-func Test_node_GetName_File(t *testing.T) {
-	res := newNode("a", "b", "c.txt").GetName()
+func Test_ioNode_GetName_File(t *testing.T) {
+	ioPath := NewIOPath()
+	res := newIONode(ioPath, "a", "b", "c.txt").GetName()
 	assert.Equal(t, res, "c.txt")
 }
 
-func Test_node_GetParent_Directory(t *testing.T) {
-	res := NewDirectory("a", "b").GetParent()
+func Test_ioNode_GetParent_Directory(t *testing.T) {
+	ioPath := NewIOPath()
+	res := newIONode(ioPath, "a", "b").GetParent()
 	assert.Equal(
 		t,
 		res.GetPath(),
@@ -39,8 +30,9 @@ func Test_node_GetParent_Directory(t *testing.T) {
 	)
 }
 
-func Test_node_GetParent_File(t *testing.T) {
-	res := NewDirectory("a", "b.txt").GetParent()
+func Test_ioNode_GetParent_File(t *testing.T) {
+	ioPath := NewIOPath()
+	res := newIONode(ioPath, "a", "b.txt").GetParent()
 	assert.Equal(
 		t,
 		res.GetPath(),
@@ -48,24 +40,27 @@ func Test_node_GetParent_File(t *testing.T) {
 	)
 }
 
-func Test_node_IsExist_F(t *testing.T) {
-	res := newNode("a", "b", "c").IsExist()
+func Test_ioNode_IsExist_F(t *testing.T) {
+	ioPath := NewIOPath()
+	res := newIONode(ioPath, "a", "b", "c").IsExist()
 	assert.False(t, res)
 }
 
-func Test_node_IsExist_T(t *testing.T) {
+func Test_ioNode_IsExist_T(t *testing.T) {
 	wd, err := os.Getwd()
 	assert.NoError(t, err)
 
-	res := newNode(wd, "node.go").IsExist()
+	ioPath := NewIOPath()
+	res := newIONode(ioPath, wd, "io-node.go").IsExist()
 	assert.True(t, res)
 }
 
-func Test_node_Move_File(t *testing.T) {
+func Test_ioNode_Move_File(t *testing.T) {
 	wd, err := os.Getwd()
 	assert.NoError(t, err)
 
-	node := newNode(wd, "move.go")
+	ioPath := NewIOPath()
+	node := newIONode(ioPath, wd, "move.go")
 	err = ioutil.WriteFile(
 		node.GetPath(),
 		make([]byte, 0),
@@ -75,7 +70,7 @@ func Test_node_Move_File(t *testing.T) {
 
 	defer node.Remove()
 
-	dstNode := newNode(wd, "move-dst.go")
+	dstNode := newIONode(ioPath, wd, "move-dst.go")
 	defer dstNode.Remove()
 
 	err = node.Move(
@@ -93,11 +88,12 @@ func Test_node_Move_File(t *testing.T) {
 	)
 }
 
-func Test_node_Move_FileIsExist(t *testing.T) {
+func Test_ioNode_Move_FileIsExist(t *testing.T) {
 	wd, err := os.Getwd()
 	assert.NoError(t, err)
 
-	node := newNode(wd, "move.go")
+	ioPath := NewIOPath()
+	node := newIONode(ioPath, wd, "move.go")
 
 	err = ioutil.WriteFile(
 		node.GetPath(),
@@ -108,7 +104,7 @@ func Test_node_Move_FileIsExist(t *testing.T) {
 
 	defer node.Remove()
 
-	dstNode := newNode(wd, "move-dst.go")
+	dstNode := newIONode(ioPath, wd, "move-dst.go")
 
 	err = ioutil.WriteFile(
 		dstNode.GetPath(),
@@ -134,11 +130,12 @@ func Test_node_Move_FileIsExist(t *testing.T) {
 	)
 }
 
-func Test_node_Remove_Directory(t *testing.T) {
+func Test_ioNode_Remove_Directory(t *testing.T) {
 	wd, err := os.Getwd()
 	assert.NoError(t, err)
 
-	node := newNode(wd, "remove")
+	ioPath := NewIOPath()
+	node := newIONode(ioPath, wd, "remove")
 	err = os.Mkdir(
 		node.GetPath(),
 		os.ModePerm,
@@ -156,11 +153,12 @@ func Test_node_Remove_Directory(t *testing.T) {
 	assert.False(t, ok)
 }
 
-func Test_node_Remove_DirectoryHasChildren(t *testing.T) {
+func Test_ioNode_Remove_DirectoryHasChildren(t *testing.T) {
 	wd, err := os.Getwd()
 	assert.NoError(t, err)
 
-	node := newNode(wd, "remove")
+	ioPath := NewIOPath()
+	node := newIONode(ioPath, wd, "remove")
 	err = os.Mkdir(
 		node.GetPath(),
 		os.ModePerm,
@@ -171,7 +169,7 @@ func Test_node_Remove_DirectoryHasChildren(t *testing.T) {
 		node.GetPath(),
 	)
 
-	childNodePath := iopath.Join(
+	childNodePath := ioPath.Join(
 		node.GetPath(),
 		"one",
 	)
@@ -190,11 +188,12 @@ func Test_node_Remove_DirectoryHasChildren(t *testing.T) {
 	assert.False(t, ok)
 }
 
-func Test_node_Remove_File(t *testing.T) {
+func Test_ioNode_Remove_File(t *testing.T) {
 	wd, err := os.Getwd()
 	assert.NoError(t, err)
 
-	node := newNode(wd, "remove.go")
+	ioPath := NewIOPath()
+	node := newIONode(ioPath, wd, "remove.go")
 	err = ioutil.WriteFile(
 		node.GetPath(),
 		make([]byte, 0),
@@ -213,7 +212,8 @@ func Test_node_Remove_File(t *testing.T) {
 	assert.False(t, ok)
 }
 
-func Test_node_Remove_不存在(t *testing.T) {
-	err := newNode("a", "b", "c").Remove()
+func Test_ioNode_Remove_不存在(t *testing.T) {
+	ioPath := NewIOPath()
+	err := newIONode(ioPath, "a", "b", "c").Remove()
 	assert.NoError(t, err)
 }

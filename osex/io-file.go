@@ -1,4 +1,4 @@
-package ioos
+package osex
 
 import (
 	"encoding/json"
@@ -12,16 +12,16 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type file struct {
+type ioFile struct {
 	ioex.INode
 }
 
-func (m file) GetExt() string {
+func (m ioFile) GetExt() string {
 	filePath := m.GetPath()
 	return filepath.Ext(filePath)
 }
 
-func (m file) GetFile() (*os.File, error) {
+func (m ioFile) GetFile() (*os.File, error) {
 	var file *os.File
 	var err error
 	filePath := m.GetPath()
@@ -33,10 +33,10 @@ func (m file) GetFile() (*os.File, error) {
 	return file, err
 }
 
-func (m file) Read(v interface{}) error {
+func (m ioFile) Read(v interface{}) error {
 	value := reflect.ValueOf(v)
 	if value.Kind() != reflect.Ptr {
-		return fmt.Errorf("osex.file.Read: v必须为指针")
+		return fmt.Errorf("osex.ioFile.Read: v必须为指针")
 	}
 
 	f, err := m.GetFile()
@@ -63,12 +63,12 @@ func (m file) Read(v interface{}) error {
 	}
 
 	return fmt.Errorf(
-		"不支持ioos.file.Read(%s)",
+		"不支持osex.ioFile.Read(%s)",
 		value.Type(),
 	)
 }
 
-func (m file) ReadJSON(data interface{}) error {
+func (m ioFile) ReadJSON(data interface{}) error {
 	var bf []byte
 	if err := m.Read(&bf); err != nil {
 		return err
@@ -77,7 +77,7 @@ func (m file) ReadJSON(data interface{}) error {
 	return json.Unmarshal(bf, data)
 }
 
-func (m file) ReadYaml(data interface{}) error {
+func (m ioFile) ReadYaml(data interface{}) error {
 	var bf []byte
 	if err := m.Read(&bf); err != nil {
 		return err
@@ -86,7 +86,7 @@ func (m file) ReadYaml(data interface{}) error {
 	return yaml.Unmarshal(bf, data)
 }
 
-func (m file) Write(data interface{}) error {
+func (m ioFile) Write(data interface{}) error {
 	dataType := reflect.TypeOf(data)
 	if dataType.Kind() == reflect.String {
 		return m.writeString(
@@ -94,10 +94,13 @@ func (m file) Write(data interface{}) error {
 		)
 	}
 
-	return fmt.Errorf("osex.file.Write暂不支持%s", dataType.Kind())
+	return fmt.Errorf(
+		"osex.ioFile.Write暂不支持%s",
+		dataType.Kind(),
+	)
 }
 
-func (m file) writeString(s string) error {
+func (m ioFile) writeString(s string) error {
 	file, err := m.GetFile()
 	if err != nil {
 		return err
@@ -108,9 +111,9 @@ func (m file) writeString(s string) error {
 	return err
 }
 
-// NewFile is 创建io.IFile实例
-func NewFile(pathArgs ...string) ioex.IFile {
-	return &file{
-		INode: newNode(pathArgs...),
+// NewIOFile is 创建io.IFile实例
+func NewIOFile(ioPath ioex.IPath, paths ...string) ioex.IFile {
+	return &ioFile{
+		INode: newIONode(ioPath, paths...),
 	}
 }

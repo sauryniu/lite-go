@@ -1,4 +1,4 @@
-package ioos
+package osex
 
 import (
 	"io/ioutil"
@@ -8,16 +8,18 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_file_GetExt(t *testing.T) {
-	res := NewFile("a.txt").GetExt()
+func Test_ioFile_GetExt(t *testing.T) {
+	ioPath := NewIOPath()
+	res := NewIOFile(ioPath, "a.txt").GetExt()
 	assert.Equal(t, res, ".txt")
 }
 
-func Test_file_GetFile(t *testing.T) {
+func Test_ioFile_GetFile(t *testing.T) {
 	wd, err := os.Getwd()
 	assert.NoError(t, err)
 
-	file := NewFile(wd, "get-file.txt")
+	ioPath := NewIOPath()
+	file := NewIOFile(ioPath, wd, "get-file.txt")
 	f, err := file.GetFile()
 	assert.NoError(t, err)
 
@@ -28,11 +30,12 @@ func Test_file_GetFile(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func Test_file_Read_Bytes(t *testing.T) {
+func Test_ioFile_Read_Bytes(t *testing.T) {
 	wd, err := os.Getwd()
 	assert.NoError(t, err)
 
-	file := NewFile(wd, "read.txt")
+	ioPath := NewIOPath()
+	file := NewIOFile(ioPath, wd, "read.txt")
 	defer file.Remove()
 
 	f, err := file.GetFile()
@@ -54,11 +57,12 @@ func Test_file_Read_Bytes(t *testing.T) {
 	)
 }
 
-func Test_file_Read_JSON(t *testing.T) {
+func Test_ioFile_Read_JSON(t *testing.T) {
 	wd, err := os.Getwd()
 	assert.NoError(t, err)
 
-	file := NewFile(wd, "read.txt")
+	ioPath := NewIOPath()
+	file := NewIOFile(ioPath, wd, "read.txt")
 	defer file.Remove()
 
 	f, err := file.GetFile()
@@ -80,15 +84,16 @@ func Test_file_Read_JSON(t *testing.T) {
 	assert.Equal(
 		t,
 		err.Error(),
-		"不支持ioos.file.Read(ioos.testStruct)",
+		"不支持osex.ioFile.Read(osex.testStruct)",
 	)
 }
 
-func Test_file_Read_String(t *testing.T) {
+func Test_ioFile_Read_String(t *testing.T) {
 	wd, err := os.Getwd()
 	assert.NoError(t, err)
 
-	file := NewFile(wd, "read.txt")
+	ioPath := NewIOPath()
+	file := NewIOFile(ioPath, wd, "read.txt")
 	defer file.Remove()
 
 	f, err := file.GetFile()
@@ -106,11 +111,12 @@ func Test_file_Read_String(t *testing.T) {
 	assert.Equal(t, res, text)
 }
 
-func Test_file_ReadJSON(t *testing.T) {
+func Test_ioFile_ReadJSON(t *testing.T) {
 	wd, err := os.Getwd()
 	assert.NoError(t, err)
 
-	file := NewFile(wd, "read-json.txt")
+	ioPath := NewIOPath()
+	file := NewIOFile(ioPath, wd, "read-json.txt")
 	defer file.Remove()
 
 	f, err := file.GetFile()
@@ -135,11 +141,12 @@ func Test_file_ReadJSON(t *testing.T) {
 	})
 }
 
-func Test_file_ReadYaml(t *testing.T) {
+func Test_ioFile_ReadYaml(t *testing.T) {
 	wd, err := os.Getwd()
 	assert.NoError(t, err)
 
-	file := NewFile(wd, "read-yaml.txt")
+	ioPath := NewIOPath()
+	file := NewIOFile(ioPath, wd, "read-yaml.txt")
 	defer file.Remove()
 
 	f, err := file.GetFile()
@@ -167,11 +174,12 @@ ages:
 	})
 }
 
-func Test_file_Write_String(t *testing.T) {
+func Test_ioFile_Write_String(t *testing.T) {
 	wd, err := os.Getwd()
 	assert.NoError(t, err)
 
-	file := NewFile(wd, "write.txt")
+	ioPath := NewIOPath()
+	file := NewIOFile(ioPath, wd, "write.txt")
 	err = file.Write("aa")
 
 	defer file.Remove()

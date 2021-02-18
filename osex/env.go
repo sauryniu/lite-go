@@ -2,7 +2,7 @@ package osex
 
 import (
 	"os"
-	reflect "reflect"
+	"reflect"
 
 	jsoniter "github.com/json-iterator/go"
 )
@@ -19,7 +19,7 @@ func (m osEnv) Get(k string, v interface{}) {
 	}
 }
 
-// NewOSEnv is 创建系统IEnv
-func NewOSEnv() IEnv {
+// NewEnv is 创建系统IEnv
+func NewEnv() IEnv {
 	return new(osEnv)
 }
