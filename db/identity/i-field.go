@@ -1,3 +1,5 @@
+//go:generate mockgen -destination i-field_mock.go -package identity github.com/ahl5esoft/lite-go/db/identity IField
+
 package identity
 
 import "reflect"

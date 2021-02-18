@@ -4,8 +4,8 @@ import (
 	"reflect"
 
 	underscore "github.com/ahl5esoft/golang-underscore"
-	"github.com/ahl5esoft/lite-go/plugin/db"
-	"github.com/ahl5esoft/lite-go/plugin/db/identity"
+	"github.com/ahl5esoft/lite-go/db"
+	"github.com/ahl5esoft/lite-go/db/identity"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )

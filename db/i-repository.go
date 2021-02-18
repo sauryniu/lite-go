@@ -1,6 +1,6 @@
 package db
 
-import "github.com/ahl5esoft/lite-go/plugin/db/identity"
+import "github.com/ahl5esoft/lite-go/db/identity"
 
 // IRepository is 表仓库
 type IRepository interface {

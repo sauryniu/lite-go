@@ -3,7 +3,7 @@ package mongodb
 import (
 	"reflect"
 
-	"github.com/ahl5esoft/lite-go/plugin/db/identity"
+	"github.com/ahl5esoft/lite-go/db/identity"
 )
 
 const (

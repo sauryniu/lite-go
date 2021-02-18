@@ -1,6 +1,6 @@
 package db
 
-import "github.com/ahl5esoft/lite-go/plugin/db/identity"
+import "github.com/ahl5esoft/lite-go/db/identity"
 
 // IFactory is 数据工厂
 type IFactory interface {

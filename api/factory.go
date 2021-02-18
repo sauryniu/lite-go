@@ -7,8 +7,8 @@ import (
 )
 
 var (
-	factoryInstane = make(factory)
-	invalid        = new(invalidAPI)
+	factoryInstance = make(factory)
+	invalid         = new(invalidAPI)
 )
 
 type factory map[string]map[string]reflect.Type
@@ -26,18 +26,18 @@ func (m factory) Build(endpoint, name string) IAPI {
 
 // NewFactory is 创建API工厂
 func NewFactory() IFactory {
-	return factoryInstane
+	return factoryInstance
 }
 
 // Register is 注册api
 func Register(endpoint, name string, api IAPI) {
-	if _, ok := factoryInstane[endpoint]; !ok {
-		factoryInstane[endpoint] = make(map[string]reflect.Type)
+	if _, ok := factoryInstance[endpoint]; !ok {
+		factoryInstance[endpoint] = make(map[string]reflect.Type)
 	}
 
 	apiType := reflect.TypeOf(api)
 	if apiType.Kind() == reflect.Ptr {
 		apiType = apiType.Elem()
 	}
-	factoryInstane[endpoint][name] = apiType
+	factoryInstance[endpoint][name] = apiType
 }

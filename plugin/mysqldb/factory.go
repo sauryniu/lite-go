@@ -1,15 +1,16 @@
-package mongodb
+package mysqldb
 
 import (
 	"reflect"
 
 	underscore "github.com/ahl5esoft/golang-underscore"
-	"github.com/ahl5esoft/lite-go/plugin/db"
-	"github.com/ahl5esoft/lite-go/plugin/db/identity"
+	"github.com/ahl5esoft/lite-go/db"
+	"github.com/ahl5esoft/lite-go/db/identity"
+	"github.com/jmoiron/sqlx"
 )
 
 type factory struct {
-	pool *connectPool
+	DB *sqlx.DB
 }
 
 func (m factory) Db(entry identity.IIdentity, extra ...interface{}) db.IRepository {
@@ -26,24 +27,27 @@ func (m factory) Db(entry identity.IIdentity, extra ...interface{}) db.IReposito
 		uow = m.Uow().(*unitOfWork)
 	}
 
-	modelStruct := identity.NewStruct(
-		reflect.TypeOf(entry),
-	)
-	return newRepository(m.pool, modelStruct, uow, isTx)
+	return repository{
+		DB:        m.DB,
+		IsTx:      isTx,
+		ModelType: reflect.TypeOf(entry),
+		Uow:       uow,
+	}
 }
 
 func (m factory) Uow() db.IUnitOfWork {
-	return newUnitOfWork(m.pool)
+	return newUnitOfWork(m.DB)
 }
 
 // New is 创建db.IDbFactory
-func New(uri, dbName string) (db.IFactory, error) {
-	pool := newPool(uri, dbName)
-	if _, err := pool.GetClient(); err != nil {
-		return nil, err
+func New(connString string) (f db.IFactory, err error) {
+	var db *sqlx.DB
+	if db, err = sqlx.Open("mysql", connString); err != nil {
+		return
 	}
 
-	return &factory{
-		pool: pool,
-	}, nil
+	f = &factory{
+		DB: db,
+	}
+	return
 }

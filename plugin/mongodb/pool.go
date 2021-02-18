@@ -3,7 +3,7 @@ package mongodb
 import (
 	"context"
 
-	"github.com/ahl5esoft/lite-go/plugin/db/identity"
+	"github.com/ahl5esoft/lite-go/db/identity"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )

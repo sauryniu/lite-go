@@ -3,8 +3,8 @@ package mysqldb
 import (
 	"reflect"
 
-	"github.com/ahl5esoft/lite-go/plugin/db"
-	"github.com/ahl5esoft/lite-go/plugin/db/identity"
+	"github.com/ahl5esoft/lite-go/db"
+	"github.com/ahl5esoft/lite-go/db/identity"
 	"github.com/jmoiron/sqlx"
 )
 

@@ -4,7 +4,7 @@ import (
 	"reflect"
 
 	underscore "github.com/ahl5esoft/golang-underscore"
-	"github.com/ahl5esoft/lite-go/plugin/db"
+	"github.com/ahl5esoft/lite-go/db"
 	"github.com/jmoiron/sqlx"
 )
 
