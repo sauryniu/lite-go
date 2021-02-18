@@ -94,8 +94,8 @@ func (m osCommand) scan(reader io.ReadCloser, msg chan string) {
 	}()
 }
 
-// NewOSCommand is 创建ICommand
-func NewOSCommand() ICommand {
+// NewCommand is 创建ICommand
+func NewCommand() ICommand {
 	return &osCommand{
 		expires: 4 * time.Second,
 	}
