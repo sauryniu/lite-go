@@ -6,12 +6,14 @@ import (
 
 	"github.com/ahl5esoft/lite-go/api"
 	"github.com/ahl5esoft/lite-go/errorex"
+	"github.com/ahl5esoft/lite-go/log"
 	"github.com/go-playground/validator/v10"
 	jsoniter "github.com/json-iterator/go"
 )
 
 type apiPort struct {
 	apiFactory api.IFactory
+	log        log.ILog
 	project    string
 	pub        IPublisher
 	sub        ISubscriber
@@ -21,11 +23,10 @@ type apiPort struct {
 
 func (m apiPort) Listen() {
 	m.sub.Subscribe([]string{m.project}, m.subMsg)
-	fmt.Println(
-		m.project,
-		"启动于",
+	m.log.AddAttr("project", m.project).AddAttr(
+		"run-at",
 		time.Now().Format("2006-01-02 15:04:05"),
-	)
+	).Info()
 
 	for {
 		m.handle()
@@ -74,6 +75,7 @@ func (m apiPort) handle() {
 	apiInstance := m.apiFactory.Build(req.Endpoint, req.API)
 	jsoniter.UnmarshalFromString(req.Body, apiInstance)
 	if err = m.validate.Struct(apiInstance); err != nil {
+		m.log.AddAttr("validate", "%v", err).Error()
 		err = errorex.New(errorex.VerifyCode, "")
 		return
 	}
@@ -82,9 +84,10 @@ func (m apiPort) handle() {
 }
 
 // NewAPIPort is 发布订阅端口
-func NewAPIPort(project string, sub ISubscriber, pub IPublisher, apiFactory api.IFactory) api.IPort {
+func NewAPIPort(project string, sub ISubscriber, pub IPublisher, apiFactory api.IFactory, log log.ILog) api.IPort {
 	return &apiPort{
 		apiFactory: apiFactory,
+		log:        log,
 		project:    project,
 		pub:        pub,
 		sub:        sub,
