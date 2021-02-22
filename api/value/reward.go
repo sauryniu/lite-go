@@ -4,7 +4,13 @@ package value
 type Reward struct {
 	Count       int64
 	Route       string
-	TargetType  int
+	TargetType  TargetTypeValue
 	TargetIndex int
-	ValueType   int
+	ValueType   TypeValue
 }
+
+// TargetTypeValue is 目标类型值
+type TargetTypeValue int
+
+// TypeValue is 数值类型值
+type TypeValue int
