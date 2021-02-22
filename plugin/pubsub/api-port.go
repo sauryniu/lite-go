@@ -23,7 +23,7 @@ type apiPort struct {
 
 func (m apiPort) Listen() {
 	m.sub.Subscribe([]string{m.project}, m.subMsg)
-	m.log.AddAttr("project", m.project).AddAttr(
+	m.log.AddDesc(m.project).AddAttr(
 		"run-at",
 		time.Now().Format("2006-01-02 15:04:05"),
 	).Info()
