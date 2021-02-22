@@ -18,15 +18,13 @@ func Test_userAPICaller_CommitUpdate(t *testing.T) {
 		self := userAPICaller{
 			apiCaller:         mockAPICaller,
 			commitUpdateRoute: "caller-route",
-			updateRequests: []updateRequest{
+			rewards: []userReward{
 				{
-					Rewards: []Reward{
-						{
-							Count:       1,
-							TargetIndex: 2,
-							TargetType:  3,
-							ValueType:   4,
-						},
+					Reward: Reward{
+						Count:       1,
+						TargetIndex: 2,
+						TargetType:  3,
+						ValueType:   4,
 					},
 					UserID: "one",
 				},
@@ -35,25 +33,30 @@ func Test_userAPICaller_CommitUpdate(t *testing.T) {
 
 		commitUpdateRoute := "route"
 		mockAPICaller.EXPECT().VoidCall(self.commitUpdateRoute, commitUpdateRequest{
-			Messages: []updateRequest{
+			Rewards: []userReward{
 				{
-					Rewards: self.updateRequests[0].Rewards,
-					Route:   commitUpdateRoute,
-					UserID:  self.updateRequests[0].UserID,
+					Reward: Reward{
+						Count:       1,
+						Route:       commitUpdateRoute,
+						TargetIndex: 2,
+						TargetType:  3,
+						ValueType:   4,
+					},
+					UserID: self.rewards[0].UserID,
 				},
 			},
 		}).Return(nil)
 
 		err := self.CommitUpdate(commitUpdateRoute)
 		assert.NoError(t, err)
-		assert.Len(t, self.updateRequests, 0)
+		assert.Len(t, self.rewards, 0)
 	})
 }
 
 func Test_userAPICaller_Update(t *testing.T) {
 	t.Run("ok", func(t *testing.T) {
 		self := userAPICaller{
-			updateRequests: make([]updateRequest, 0),
+			rewards: make([]userReward, 0),
 		}
 		userID := "one"
 		reward := Reward{
@@ -63,10 +66,10 @@ func Test_userAPICaller_Update(t *testing.T) {
 			ValueType:   4,
 		}
 		self.Update(userID, reward)
-		assert.EqualValues(t, self.updateRequests, []updateRequest{
+		assert.EqualValues(t, self.rewards, []userReward{
 			{
-				Rewards: []Reward{reward},
-				UserID:  userID,
+				Reward: reward,
+				UserID: userID,
 			},
 		})
 	})

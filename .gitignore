@@ -1,5 +1,6 @@
 .vscode/
 envtests/
+api/value/user-api-caller_env_test.go
 main.go
 main.exe
 package.json

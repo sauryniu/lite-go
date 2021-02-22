@@ -11,39 +11,41 @@ const (
 )
 
 type commitUpdateRequest struct {
-	Messages []updateRequest
+	Rewards []userReward
 }
 
-type updateRequest struct {
-	Rewards []Reward
-	Route   string
-	UserID  string
+type userReward struct {
+	Reward
+
+	UserID string
 }
 
 type userAPICaller struct {
 	apiCaller         api.ICaller
 	commitUpdateRoute string
-	updateRequests    []updateRequest
+	rewards           []userReward
 }
 
 func (m *userAPICaller) CommitUpdate(route string) error {
 	defer func() {
-		m.updateRequests = make([]updateRequest, 0)
+		m.rewards = make([]userReward, 0)
 	}()
 
-	for i := 0; i < len(m.updateRequests); i++ {
-		m.updateRequests[i].Route = route
+	for i := 0; i < len(m.rewards); i++ {
+		m.rewards[i].Route = route
 	}
 	return m.apiCaller.VoidCall(m.commitUpdateRoute, commitUpdateRequest{
-		Messages: m.updateRequests,
+		Rewards: m.rewards,
 	})
 }
 
 func (m *userAPICaller) Update(userID string, rewards ...Reward) {
-	m.updateRequests = append(m.updateRequests, updateRequest{
-		Rewards: rewards,
-		UserID:  userID,
-	})
+	for _, r := range rewards {
+		m.rewards = append(m.rewards, userReward{
+			Reward: r,
+			UserID: userID,
+		})
+	}
 }
 
 // NewUserAPICall is IUserAPICaller实例
@@ -51,6 +53,6 @@ func NewUserAPICall(apiCaller api.ICaller, app string) IUserAPICaller {
 	return &userAPICaller{
 		apiCaller:         apiCaller,
 		commitUpdateRoute: fmt.Sprintf(commitUpdateRouteFormat, app),
-		updateRequests:    make([]updateRequest, 0),
+		rewards:           make([]userReward, 0),
 	}
 }
