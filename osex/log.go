@@ -15,6 +15,11 @@ func (m *osLog) AddAttr(key, format string, v ...interface{}) log.ILog {
 	return m
 }
 
+func (m *osLog) AddDesc(format string, v ...interface{}) log.ILog {
+	m.AddAttr("desc", format, v...)
+	return m
+}
+
 func (m *osLog) Debug() {
 	m.print("debug")
 }
