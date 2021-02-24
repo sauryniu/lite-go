@@ -116,6 +116,10 @@ func (m goRedis) Time() (time.Time, error) {
 	return m.client.Time().Result()
 }
 
+func (m goRedis) TTL(key string) (time.Duration, error) {
+	return m.client.TTL(key).Result()
+}
+
 func (m goRedis) Unsubscribe(channels ...string) (err error) {
 	underscore.Chain(channels).Map(func(r string, _ int) error {
 		if sub, ok := m.subs[r]; ok {

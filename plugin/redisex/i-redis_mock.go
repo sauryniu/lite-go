@@ -164,6 +164,21 @@ func (mr *MockIRedisMockRecorder) Subscribe(arg0, arg1 interface{}) *gomock.Call
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Subscribe", reflect.TypeOf((*MockIRedis)(nil).Subscribe), arg0, arg1)
 }
 
+// TTL mocks base method
+func (m *MockIRedis) TTL(arg0 string) (time.Duration, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "TTL", arg0)
+	ret0, _ := ret[0].(time.Duration)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// TTL indicates an expected call of TTL
+func (mr *MockIRedisMockRecorder) TTL(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TTL", reflect.TypeOf((*MockIRedis)(nil).TTL), arg0)
+}
+
 // Time mocks base method
 func (m *MockIRedis) Time() (time.Time, error) {
 	m.ctrl.T.Helper()

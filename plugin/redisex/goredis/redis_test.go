@@ -396,6 +396,36 @@ func Test_goRedis_Subscribe(t *testing.T) {
 	})
 }
 
+func Test_goRedis_TTL(t *testing.T) {
+	t.Run("不存在", func(t *testing.T) {
+		key := "ttl-not-exists"
+		res, err := self.TTL(key)
+		assert.NoError(t, err)
+		assert.Equal(t, res, -2*time.Second)
+	})
+
+	t.Run("无过期", func(t *testing.T) {
+		key := "ttl-no-expires"
+		client.Set(key, "", 0*time.Second)
+		defer client.Del(key)
+
+		res, err := self.TTL(key)
+		assert.NoError(t, err)
+		assert.Equal(t, res, -1*time.Second)
+	})
+
+	t.Run("5s", func(t *testing.T) {
+		key := "ttl-5s"
+		expires := 5 * time.Second
+		client.Set(key, "", expires)
+		defer client.Del(key)
+
+		res, err := self.TTL(key)
+		assert.NoError(t, err)
+		assert.Equal(t, res, expires)
+	})
+}
+
 func Test_goRedis_Unsubscribe(t *testing.T) {
 	channel := "Test_goRedis_Unsubscribe"
 

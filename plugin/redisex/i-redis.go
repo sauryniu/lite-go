@@ -20,4 +20,5 @@ type IRedis interface {
 	Get(string) (string, error)
 	Set(string, string, ...interface{}) (bool, error)
 	Time() (time.Time, error)
+	TTL(key string) (time.Duration, error)
 }
