@@ -1,8 +1,8 @@
 package pubsub
 
 type apiMessage struct {
-	API      string
-	Body     string
-	Endpoint string
-	ReplyID  string
+	API      string `json:"api"`
+	Body     string `json:"body"`
+	Endpoint string `json:"endpoint"`
+	ReplyID  string `json:"replyID"`
 }

@@ -36,7 +36,7 @@ func (m apiCaller) Get(k string, v interface{}) error {
 		},
 		5*time.Second,
 	)
-	if err != nil {
+	if err != nil || res.(string) == "" {
 		return err
 	}
 
