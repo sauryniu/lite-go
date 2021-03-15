@@ -25,7 +25,7 @@ func (m apiPort) Listen() {
 	m.sub.Subscribe([]string{m.project}, m.subMsg)
 	m.log.AddDesc(m.project).AddAttr(
 		"run-at",
-		time.Now().Format("2006-01-02 15:04:05"),
+		time.Now().Format("2006-01-02 03:04:05"),
 	).Info()
 
 	for {
