@@ -32,7 +32,6 @@ func (m ioPath) Join(paths ...string) string {
 	return res
 }
 
-// NewIOPath is 路径实例
 func NewIOPath(rootArgs ...string) contract.IIOPath {
 	p := new(ioPath)
 	p.root = p.Join(rootArgs...)
