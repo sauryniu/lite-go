@@ -33,18 +33,32 @@ func (m *MockIDbRepository) EXPECT() *MockIDbRepositoryMockRecorder {
 	return m.recorder
 }
 
-// Add mocks base method.
-func (m *MockIDbRepository) Add(entry IDbModel) error {
+// Delete mocks base method.
+func (m *MockIDbRepository) Delete(entry IDbModel) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Add", entry)
+	ret := m.ctrl.Call(m, "Delete", entry)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// Add indicates an expected call of Add.
-func (mr *MockIDbRepositoryMockRecorder) Add(entry interface{}) *gomock.Call {
+// Delete indicates an expected call of Delete.
+func (mr *MockIDbRepositoryMockRecorder) Delete(entry interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Add", reflect.TypeOf((*MockIDbRepository)(nil).Add), entry)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockIDbRepository)(nil).Delete), entry)
+}
+
+// Insert mocks base method.
+func (m *MockIDbRepository) Insert(entry IDbModel) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Insert", entry)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Insert indicates an expected call of Insert.
+func (mr *MockIDbRepositoryMockRecorder) Insert(entry interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Insert", reflect.TypeOf((*MockIDbRepository)(nil).Insert), entry)
 }
 
 // Query mocks base method.
@@ -61,30 +75,16 @@ func (mr *MockIDbRepositoryMockRecorder) Query() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Query", reflect.TypeOf((*MockIDbRepository)(nil).Query))
 }
 
-// Remove mocks base method.
-func (m *MockIDbRepository) Remove(entry IDbModel) error {
+// Update mocks base method.
+func (m *MockIDbRepository) Update(entry IDbModel) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Remove", entry)
+	ret := m.ctrl.Call(m, "Update", entry)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// Remove indicates an expected call of Remove.
-func (mr *MockIDbRepositoryMockRecorder) Remove(entry interface{}) *gomock.Call {
+// Update indicates an expected call of Update.
+func (mr *MockIDbRepositoryMockRecorder) Update(entry interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Remove", reflect.TypeOf((*MockIDbRepository)(nil).Remove), entry)
-}
-
-// Save mocks base method.
-func (m *MockIDbRepository) Save(entry IDbModel) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Save", entry)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// Save indicates an expected call of Save.
-func (mr *MockIDbRepositoryMockRecorder) Save(entry interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Save", reflect.TypeOf((*MockIDbRepository)(nil).Save), entry)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockIDbRepository)(nil).Update), entry)
 }

@@ -1,9 +1,13 @@
 package contract
 
-// IDbRepository is 数据仓库
+// 数据仓库
 type IDbRepository interface {
-	Add(entry IDbModel) error
+	// 删除
+	Delete(entry IDbModel) error
+	// 新增
+	Insert(entry IDbModel) error
+	// 创建查询
 	Query() IDbQuery
-	Remove(entry IDbModel) error
-	Save(entry IDbModel) error
+	// 更新
+	Update(entry IDbModel) error
 }

@@ -8,7 +8,7 @@ import (
 )
 
 type testModelMetadataModel struct {
-	ID   string `db:"id" alias:"test"`
+	ID   string `alias:"test" db:"id"`
 	Name string `db:"name"`
 }
 

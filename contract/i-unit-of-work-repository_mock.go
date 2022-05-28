@@ -47,38 +47,38 @@ func (mr *MockIUnitOfWorkRepositoryMockRecorder) Commit() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Commit", reflect.TypeOf((*MockIUnitOfWorkRepository)(nil).Commit))
 }
 
-// RegisterAdd mocks base method.
-func (m *MockIUnitOfWorkRepository) RegisterAdd(entry IDbModel) {
+// RegisterDelete mocks base method.
+func (m *MockIUnitOfWorkRepository) RegisterDelete(entry IDbModel) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "RegisterAdd", entry)
+	m.ctrl.Call(m, "RegisterDelete", entry)
 }
 
-// RegisterAdd indicates an expected call of RegisterAdd.
-func (mr *MockIUnitOfWorkRepositoryMockRecorder) RegisterAdd(entry interface{}) *gomock.Call {
+// RegisterDelete indicates an expected call of RegisterDelete.
+func (mr *MockIUnitOfWorkRepositoryMockRecorder) RegisterDelete(entry interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegisterAdd", reflect.TypeOf((*MockIUnitOfWorkRepository)(nil).RegisterAdd), entry)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegisterDelete", reflect.TypeOf((*MockIUnitOfWorkRepository)(nil).RegisterDelete), entry)
 }
 
-// RegisterRemove mocks base method.
-func (m *MockIUnitOfWorkRepository) RegisterRemove(entry IDbModel) {
+// RegisterInsert mocks base method.
+func (m *MockIUnitOfWorkRepository) RegisterInsert(entry IDbModel) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "RegisterRemove", entry)
+	m.ctrl.Call(m, "RegisterInsert", entry)
 }
 
-// RegisterRemove indicates an expected call of RegisterRemove.
-func (mr *MockIUnitOfWorkRepositoryMockRecorder) RegisterRemove(entry interface{}) *gomock.Call {
+// RegisterInsert indicates an expected call of RegisterInsert.
+func (mr *MockIUnitOfWorkRepositoryMockRecorder) RegisterInsert(entry interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegisterRemove", reflect.TypeOf((*MockIUnitOfWorkRepository)(nil).RegisterRemove), entry)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegisterInsert", reflect.TypeOf((*MockIUnitOfWorkRepository)(nil).RegisterInsert), entry)
 }
 
-// RegisterSave mocks base method.
-func (m *MockIUnitOfWorkRepository) RegisterSave(entry IDbModel) {
+// RegisterUpdate mocks base method.
+func (m *MockIUnitOfWorkRepository) RegisterUpdate(entry IDbModel) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "RegisterSave", entry)
+	m.ctrl.Call(m, "RegisterUpdate", entry)
 }
 
-// RegisterSave indicates an expected call of RegisterSave.
-func (mr *MockIUnitOfWorkRepositoryMockRecorder) RegisterSave(entry interface{}) *gomock.Call {
+// RegisterUpdate indicates an expected call of RegisterUpdate.
+func (mr *MockIUnitOfWorkRepositoryMockRecorder) RegisterUpdate(entry interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegisterSave", reflect.TypeOf((*MockIUnitOfWorkRepository)(nil).RegisterSave), entry)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegisterUpdate", reflect.TypeOf((*MockIUnitOfWorkRepository)(nil).RegisterUpdate), entry)
 }
