@@ -27,7 +27,7 @@ func Test_Repository_Delete(t *testing.T) {
 		err = uow.Commit()
 		assert.NoError(t, err)
 
-		self := dbsvc.NewRepository(uow, false, func() contract.IDbQuery {
+		self := dbsvc.NewDbRepository(uow, false, func() contract.IDbQuery {
 			return newDbQuery(testDriverFactory, model)
 		})
 		err = self.Delete(entry)
@@ -55,7 +55,7 @@ func Test_Repository_Insert(t *testing.T) {
 			Int: 1,
 			Str: "add",
 		}
-		self := dbsvc.NewRepository(uow, false, func() contract.IDbQuery {
+		self := dbsvc.NewDbRepository(uow, false, func() contract.IDbQuery {
 			return newDbQuery(testDriverFactory, model)
 		})
 		err = self.Insert(entry)

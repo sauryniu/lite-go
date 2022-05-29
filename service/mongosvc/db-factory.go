@@ -29,7 +29,7 @@ func (m *dbFactory) Db(entry contract.IDbModel, extra ...interface{}) contract.I
 	model := getModelMetadata(
 		reflect.TypeOf(entry),
 	)
-	return dbsvc.NewRepository(uow, isTx, func() contract.IDbQuery {
+	return dbsvc.NewDbRepository(uow, isTx, func() contract.IDbQuery {
 		return newDbQuery(m.driverFactory, model)
 	})
 }

@@ -1,15 +1,15 @@
 package dbop
 
 // 表操作值
-type Value int
+type Value string
 
 const (
 	// 增加
-	Insert Value = iota
+	Insert Value = "c"
 	// 删除
-	Delete
+	Delete Value = "d"
 	// 更新
-	Update
+	Update Value = "u"
 	// 查询
-	Query
+	Query Value = "r"
 )

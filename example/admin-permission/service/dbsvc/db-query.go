@@ -6,17 +6,17 @@ import (
 	"github.com/ahl5esoft/lite-go/example/admin-permission/model/global"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type query struct {
-	adminPermissionDbQuery contract.IDbQuery
-	originDbQuery          contract.IDbQuery
-	filter                 bson.M
-	adminID                string
-	model                  string
+type dbQuery struct {
+	originDbQuery contract.IDbQuery
+	filter        bson.M
+	model         string
+	dbFactory     *dbFactory
 }
 
-func (m *query) Count() (count int64, err error) {
+func (m *dbQuery) Count() (count int64, err error) {
 	var filter bson.M
 	if filter, err = m.getFilter(); err != nil {
 		return
@@ -25,27 +25,27 @@ func (m *query) Count() (count int64, err error) {
 	return m.originDbQuery.Where(filter).Count()
 }
 
-func (m *query) Order(fields ...string) contract.IDbQuery {
+func (m *dbQuery) Order(fields ...string) contract.IDbQuery {
 	m.originDbQuery.Order(fields...)
 	return m
 }
 
-func (m *query) OrderByDesc(fields ...string) contract.IDbQuery {
+func (m *dbQuery) OrderByDesc(fields ...string) contract.IDbQuery {
 	m.originDbQuery.OrderByDesc(fields...)
 	return m
 }
 
-func (m *query) Skip(v int) contract.IDbQuery {
+func (m *dbQuery) Skip(v int) contract.IDbQuery {
 	m.originDbQuery.Skip(v)
 	return m
 }
 
-func (m *query) Take(v int) contract.IDbQuery {
+func (m *dbQuery) Take(v int) contract.IDbQuery {
 	m.originDbQuery.Take(v)
 	return m
 }
 
-func (m *query) ToArray(dst interface{}) (err error) {
+func (m *dbQuery) ToArray(dst interface{}) (err error) {
 	var filter bson.M
 	if filter, err = m.getFilter(); err != nil {
 		return
@@ -55,7 +55,7 @@ func (m *query) ToArray(dst interface{}) (err error) {
 	return
 }
 
-func (m *query) Where(args ...interface{}) contract.IDbQuery {
+func (m *dbQuery) Where(args ...interface{}) contract.IDbQuery {
 	if len(args) == 0 {
 		return m
 	}
@@ -66,7 +66,7 @@ func (m *query) Where(args ...interface{}) contract.IDbQuery {
 	return m
 }
 
-func (m *query) getFilter() (filter bson.M, err error) {
+func (m *dbQuery) getFilter() (filter bson.M, err error) {
 	filter = m.filter
 	m.filter = nil
 
@@ -75,21 +75,35 @@ func (m *query) getFilter() (filter bson.M, err error) {
 	}
 
 	var adminPermissions []global.AdminPermission
-	err = m.adminPermissionDbQuery.Where(bson.M{
-		"_id": m.adminID,
-	}).ToArray(&adminPermissions)
-	if err != nil {
+	if adminPermissions, err = m.dbFactory.GetAdminPermissions(); err != nil {
 		return
 	}
 
 	if len(adminPermissions) > 0 {
 		if v, ok := adminPermissions[0].Permission[m.model]; ok {
 			if cv, ok := v[dbop.Query]; ok {
-				for sk, sv := range cv.(bson.M) {
+				var doc bson.M
+				bson.Unmarshal(
+					cv.(primitive.Binary).Data,
+					&doc,
+				)
+				for sk, sv := range doc {
 					filter[sk] = sv
 				}
 			}
 		}
 	}
 	return
+}
+
+func newDbQuery(
+	originDbQuery contract.IDbQuery,
+	model string,
+	dbFactory *dbFactory,
+) contract.IDbQuery {
+	return &dbQuery{
+		dbFactory:     dbFactory,
+		originDbQuery: originDbQuery,
+		model:         model,
+	}
 }
